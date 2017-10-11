@@ -1,0 +1,17 @@
+machine:
+  node:
+    version: 6.1.0
+  post:
+    - npm install -g npm@4.6.1
+  environment:
+    CONTINUOUS_INTEGRATION: true
+
+dependencies:
+  override:
+    - npm install
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && sudo apt-get update
+    - sudo apt-get install -y gcc-4.8 g++-4.8
+
+test:
+  override:
+    - npm run lint
