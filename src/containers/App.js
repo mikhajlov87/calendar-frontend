@@ -13,7 +13,7 @@ class App extends Component {
   render() {
     return (
       <div className={styles.app}>
-        Hello world!!!
+        Hello user
       </div>
     );
   }
