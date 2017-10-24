@@ -42,6 +42,7 @@
     "babel-polyfill": "^6.3.14",
     "babel-runtime": "^6.3.19",
     "classnames": "^2.2.5",
+    "express-history-api-fallback": "^2.2.1",
     "moment": "^2.18.1",
     "node-uuid": "^1.4.8",
     "prop-types": "^15.5.10",

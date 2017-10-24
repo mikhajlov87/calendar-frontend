@@ -1,0 +1,23 @@
+.day, .today {
+  background: #dcdcdc;
+  border: 1px solid #555;
+  height: calc(100% / 5 - 4px);
+  margin: 2px;
+  width: calc(100% / 7 - 4px);
+}
+.today {
+  background: #fff;
+}
+.header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+}
+.link {
+  color: #333;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  width: 100%;
+}

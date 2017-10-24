@@ -1,21 +1,49 @@
-// Modules
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Month from '../Month/Month';
-// Styles
+import { Redirect, Route } from 'react-router-dom';
+import * as pageActions from '../../actions';
 import * as styles from './App.scss';
+import Routes from '../../routing';
 
-const App = () => (
-  <div className={styles.app}>
-    <Month />
-  </div>
-);
+class App extends Component {
+  componentWillMount() {
+    const { getCurrentDateNow } = this.props.pageActions;
+    getCurrentDateNow();
+  }
+
+  render() {
+    const date = this.props.date;
+    return (
+      <div className={styles.app}>
+        <Route
+          exact
+          path="/"
+          render={() => (
+            (date)
+              ? (<Redirect to={`/${date}`} />)
+              : (<div>loading current date...</div>)
+            )
+          }
+        />
+        <Routes />
+      </div>
+    );
+  }
+}
 
 App.propTypes = {
-  testProp: PropTypes.number
+  pageActions: PropTypes.object,
+  date: PropTypes.string
 };
 
-const mapStateToProps = state => ({ testProp: state.testProp });
+const mapStateToProps = state => ({
+  date: state.currentDate.date
+});
 
-export default connect(mapStateToProps)(App);
+const mapDispatchToProps = dispatch => ({
+  pageActions: bindActionCreators(pageActions, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
