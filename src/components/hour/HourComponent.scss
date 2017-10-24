@@ -1,0 +1,23 @@
+.hour {
+  background: #dcdcdc;
+  border: 1px solid #555;
+  display: flex;
+  height: calc(100% / 24 - 4px);
+  width: 100%;
+}
+.time {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  height: 100%;
+  justify-content: flex-start;
+  padding: 0 15px;
+}
+.caption {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: flex-start;
+  padding: 0 15px;
+  width: 100%;
+}

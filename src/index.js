@@ -2,13 +2,13 @@ import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
-import App from './containers/App/App';
 import './styles/reset.css';
+import './styles/main.css';
 import configureStore from './store/configureStore';
+import App from './containers/App/App';
 
 const store = configureStore();
 export default store;
-
 
 render(
   <Provider store={store}>
