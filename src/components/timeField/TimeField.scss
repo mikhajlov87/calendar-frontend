@@ -1,0 +1,42 @@
+.formControl {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+.formLabel {
+  margin-bottom: 8px;
+}
+.formField {
+  border: 1px solid #555;
+  border-radius: 2px;
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 2px;
+  padding: 8px 16px;
+  width: 100px;
+  &:focus {
+    outline: none;
+  }
+}
+.formControl {
+  & input::placeholder {
+    color: #555;
+  }
+}
+.notValid {
+  & input {
+    border: 1px solid #700;
+    color: #700;
+  }
+  & input::placeholder {
+    color: #700;
+  }
+}
+.error {
+  color: #700;
+  margin: 5px 0;
+}
+.warn {
+  color: #ff0;
+  margin: 5px 0;
+}
