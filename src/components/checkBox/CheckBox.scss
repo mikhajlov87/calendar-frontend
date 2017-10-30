@@ -1,0 +1,72 @@
+.formGroup {
+  align-items: center;
+  display: flex;
+  margin-bottom: 15px;
+}
+.formLabel {
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 8px;
+}
+.checkboxContainer {
+  height: 24px;
+  position: relative;
+  width: 24px;
+}
+.checkbox {
+  cursor: pointer;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  margin: 0;
+  width: 100%;
+  z-index: 2;
+}
+.checkboxBorderHidden {
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.87);
+  fill: rgba(0, 0, 0, 0.87);
+  height: 24px;
+  width: 24px;
+  user-select: none;
+  transition: opacity 650ms cubic-bezier(0.23, 1, 0.32, 1) 150ms;
+  position: absolute;
+  opacity: 0;
+}
+.checkboxBorderVisible {
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.87);
+  fill: rgba(0, 0, 0, 0.87);
+  height: 24px;
+  width: 24px;
+  user-select: none;
+  transition: opacity 1000ms cubic-bezier(0.23, 1, 0.32, 1) 200ms;
+  position: absolute;
+  opacity: 1;
+}
+.checkboxChecked {
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.87);
+  fill: rgba(0, 0, 0, 0.87);
+  height: 24px;
+  width: 24px;
+  user-select: none;
+  transition: opacity 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, transform 800ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  position: absolute;
+  opacity: 1;
+  transform: scale(1);
+}
+.checkboxUnchecked {
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.87);
+  fill: rgba(0, 0, 0, 0.87);
+  height: 24px;
+  width: 24px;
+  user-select: none;
+  transition: opacity 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, transform 0ms cubic-bezier(0.23, 1, 0.32, 1) 450ms;
+  position: absolute;
+  opacity: 0;
+  transform: scale(0);
+}
