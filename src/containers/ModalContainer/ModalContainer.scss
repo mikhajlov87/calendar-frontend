@@ -1,0 +1,35 @@
+.modalMessage {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0 19px 60px, rgba(0, 0, 0, 0.22) 0 15px 20px;
+  padding: 15px;
+  text-align: center;
+  width: 50%;
+}
+.modalOverlay {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.54);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  right: 0;
+  top: 0;
+  position: absolute;
+  word-wrap: break-word;
+}
+.modalBody {
+  color: #555;
+  font-size: 16px;
+  padding: 5px 15px;
+}
+.modalFooter {
+  padding: 15px 15px 0;
+}
+.header {
+  font-size: 48px;
+  text-transform: uppercase;
+}
+.message {
+  font-size: 16px;
+}

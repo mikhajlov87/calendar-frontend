@@ -1,5 +1,5 @@
 import { getMoment } from '../helpers/momentTime';
-import actionTypes from '../constants/actionTypes';
+import * as actionTypes from '../constants/actionTypes';
 import stringFormats from '../constants/stringFormats';
 
 const initialState = { date: '' };

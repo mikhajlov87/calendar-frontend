@@ -1,15 +1,16 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import YearPage from './containers/yearPage/YearPage';
-import MonthPage from './containers/monthPage/MonthPage';
-import DayPage from './containers/dayPage/DayPage';
-import EventPage from './containers/eventPage/EventPage';
-import NotFound from './containers/notFound/NotFound';
+import YearPage from './containers/YearPage/YearPage';
+import MonthPage from './containers/MonthPage/MonthPage';
+import DayPage from './containers/DayPage/DayPage';
+import EventPage from './containers/EventPage/EventPage';
+import NotFound from './containers/NotFound/NotFound';
 
 
 const Routes = () => (
   <Switch>
-    <Route path="/create-event" component={EventPage} />
+    <Route exact path="/event" component={EventPage} />
+    <Route exact path="/event/:edit" component={EventPage} />
     <Route exact strict path="/:year" render={({ match }) => <YearPage {...match} />} />
     <Route exact strict path="/:year/:month" render={({ match }) => <MonthPage {...match} />} />
     <Route exact path="/:year/:month/:day" render={({ match }) => <DayPage {...match} />} />

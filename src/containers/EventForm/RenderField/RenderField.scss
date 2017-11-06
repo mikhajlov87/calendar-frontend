@@ -1,0 +1,44 @@
+.formField {
+  display: block;
+}
+.formLabel {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+.formControl > input,
+.formControl > textarea {
+  color: #555;
+  border: 1px solid #555;
+  border-radius: 2px;
+  font-size: 16px;
+  outline: none;
+  padding: 8px 16px;
+  width: 100%;
+}
+input::placeholder {
+  color: #555;
+}
+.formControl > textarea {
+  height: 130px;
+  resize: none;
+}
+.notValid {
+  & > input {
+    border: 1px solid #700;
+    color: #700;
+  }
+  input::placeholder {
+    color: #700;
+  }
+}
+.error {
+  color: #700;
+}
+.warn {
+  color: #ff0;
+  margin: 5px 0;
+}
+.errorField {
+  height: 20px;
+  margin-top: 8px;
+}

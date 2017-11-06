@@ -1,11 +1,17 @@
+// Modules
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Redirect, Route } from 'react-router-dom';
-import * as pageActions from '../../actions';
-import * as styles from './App.scss';
+// Containers
+import ModalContainer from '../ModalContainer/ModalContainer';
+// Components
 import Routes from '../../routing';
+// Actions
+import * as pageActions from '../../actions';
+// Styles
+import * as styles from './App.scss';
 
 class App extends Component {
   componentWillMount() {
@@ -28,6 +34,7 @@ class App extends Component {
           }
         />
         <Routes />
+        <ModalContainer />
       </div>
     );
   }
