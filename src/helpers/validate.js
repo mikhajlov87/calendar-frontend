@@ -1,5 +1,9 @@
+import moment from 'moment';
 import timeConstant from '../constants/dataTime';
+import { supportedDateStringFormats } from '../constants/stringFormats';
 import { getMomentYearMonthDayFormat, getMomentYearMonthFormat } from './momentTime';
+
+export const validateDateString = str => moment(str, supportedDateStringFormats, true).isValid();
 
 export const validateYear = year => (+year > 0) && (year.length <= timeConstant.YEAR_STRING_LENGTH);
 
@@ -19,5 +23,14 @@ export const validateDate = ({ year, month, day }) => (
   && validateDay(day)
   && getMomentYearMonthDayFormat(`${year} ${month} ${day}`).isValid()
 );
+
+export const checkDatePastTime = (startDate, endDate) => {
+  const start = moment(startDate, supportedDateStringFormats, true);
+  const end = moment(endDate, supportedDateStringFormats, true);
+  if (start.isSame(end)) {
+    return true;
+  }
+  return start.isBefore(end);
+};
 
 export const redirectToCurrentDate = (history, date) => history.push(`/${date}`);

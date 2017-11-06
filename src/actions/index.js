@@ -1,4 +1,4 @@
-import actionTypes from '../constants/actionTypes';
+import * as actionTypes from '../constants/actionTypes';
 
 export const getCurrentDateNow = () => ({ type: actionTypes.GET_CURRENT_DATE_NOW });
 
