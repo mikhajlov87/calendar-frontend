@@ -1,7 +1,12 @@
+// Helpers
+import { createUniqueStringId } from '../helpers/eventsList';
+import { getItemFromStorage, safeItemToStorage } from '../helpers/localStorage';
+// Constants
 import * as actionTypes from '../constants/actionTypes';
+import storage from '../constants/localStorage';
 
 const initialState = {
-  data: null,
+  events: [],
   pending: false,
   error: false,
   created: false,
@@ -10,6 +15,13 @@ const initialState = {
 
 const events = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.ADD_SAVED_EVENTS_LIST_TO_STORAGE: {
+      const savedEventsList = getItemFromStorage(storage.eventsListKey);
+      return {
+        ...state,
+        events: savedEventsList || state.events
+      };
+    }
     case actionTypes.ADD_EVENT_PENDING: {
       return {
         ...state,
@@ -28,11 +40,14 @@ const events = (state = initialState, action) => {
       };
     }
     case actionTypes.ADD_EVENT_FULFILLED: {
+      const eventObject = { ...action.payload, id: createUniqueStringId() };
+      const eventsList = [...state.events, eventObject];
+      safeItemToStorage(storage.eventsListKey, eventsList);
       return {
         ...state,
+        events: eventsList,
         pending: false,
-        created: true,
-        data: action.payload
+        created: true
       };
     }
     default:

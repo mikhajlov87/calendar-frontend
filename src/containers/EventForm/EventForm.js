@@ -17,7 +17,7 @@ import { validate } from '../../helpers/formValidation';
 import formFieldsProps from './config';
 // Actions
 import * as modalActions from '../../actions/modalActions';
-import * as formActions from '../../actions/formActions';
+import * as formActions from '../../actions/eventsActions';
 // Styles
 import * as styles from './EventForm.scss';
 
