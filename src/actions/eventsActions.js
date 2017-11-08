@@ -1,4 +1,6 @@
+// Constants
 import * as actionTypes from '../constants/actionTypes';
+// Helpers
 import mockRequest from '../helpers/mockRequest';
 
 export const addEvent = data => (dispatch) => {
@@ -10,4 +12,4 @@ export const addEvent = data => (dispatch) => {
     );
 };
 
-export default addEvent;
+export const addSavedEventsListToStorage = () => ({ type: actionTypes.ADD_SAVED_EVENTS_LIST_TO_STORAGE });

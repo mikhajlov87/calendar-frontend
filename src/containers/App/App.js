@@ -8,15 +8,21 @@ import { Redirect, Route } from 'react-router-dom';
 import ModalContainer from '../ModalContainer/ModalContainer';
 // Components
 import Routes from '../../routing';
+// Helpers
+import { setupStorage } from '../../helpers/localStorage';
 // Actions
 import * as pageActions from '../../actions';
+import * as eventActions from '../../actions/eventsActions';
 // Styles
 import * as styles from './App.scss';
 
 class App extends Component {
   componentWillMount() {
     const { getCurrentDateNow } = this.props.pageActions;
+    const { addSavedEventsListToStorage } = this.props.eventsActions;
+    setupStorage();
     getCurrentDateNow();
+    addSavedEventsListToStorage();
   }
 
   render() {
@@ -42,6 +48,7 @@ class App extends Component {
 
 App.propTypes = {
   pageActions: PropTypes.object,
+  eventsActions: PropTypes.object,
   date: PropTypes.string
 };
 
@@ -50,7 +57,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  pageActions: bindActionCreators(pageActions, dispatch)
+  pageActions: bindActionCreators(pageActions, dispatch),
+  eventsActions: bindActionCreators(eventActions, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
