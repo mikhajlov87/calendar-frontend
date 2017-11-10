@@ -1,4 +1,5 @@
 const stringFormats = {
+  separateSlash_YYYY_MM_DD_HH_mm: 'YYYY/MM/DD HH:mm',
   separateSlash_YYYY_MM_D: 'YYYY/MM/D',
   separateSlash_YYYY_MM_DD: 'YYYY/MM/DD',
   separateSlash_YYYY_MM: 'YYYY/MM',
@@ -12,7 +13,10 @@ const stringFormats = {
   MM: 'MM',
   D: 'D',
   months: 'months',
-  days: 'days'
+  month: 'month',
+  days: 'days',
+  day: 'day',
+  minute: 'minute'
 };
 
 export const supportedDateStringFormats = [

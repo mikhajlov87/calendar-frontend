@@ -1,4 +1,6 @@
+// Helpers
 import { getMoment, getMomentYearMonthFormat } from './momentTime';
+// Constants
 import stringFormats from '../constants/stringFormats';
 
 export const getPreviousMonth = dateStr => (
@@ -29,9 +31,30 @@ export const getMonthDaysArr = (dateStr) => {
     daysArr.push({
       key: parseInt(dateKey, 16),
       day: date.format(stringFormats.D),
-      weekDay: date.format(stringFormats.shortWeekday_ddd),
-      isCurrentDay: now.isSame(date, 'day')
+      weekday: date.format(stringFormats.shortWeekday_ddd),
+      isCurrentDay: now.isSame(date, stringFormats.day),
+      calendarDay: date.format(stringFormats.separateSlash_YYYY_MM_DD)
     });
   }
   return daysArr;
+};
+
+export const sortEvents = (eventsArr) => {
+  const fullDayEvents = [];
+  const hourlyEvents = [];
+  const transitionalEvents = [];
+  eventsArr.forEach((eventItem) => {
+    const { isFullDay, startDate, endDate } = eventItem;
+    if (isFullDay) {
+      return fullDayEvents.push(eventItem);
+    }
+    if (startDate === endDate) {
+      return hourlyEvents.push(eventItem);
+    }
+    if (startDate !== endDate) {
+      return transitionalEvents.push(eventItem);
+    }
+    return false;
+  });
+  return { fullDayEvents, hourlyEvents, transitionalEvents };
 };

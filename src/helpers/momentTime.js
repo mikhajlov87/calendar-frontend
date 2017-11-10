@@ -1,4 +1,6 @@
+// Modules
 import moment from 'moment';
+// Constants
 import stringFormats from '../constants/stringFormats';
 
 export const getMoment = () => moment();
@@ -16,4 +18,16 @@ export const getMomentYearFormat = dateStr => moment(dateStr, stringFormats.full
 export const getMonthName = dateStr => (
   getMomentYearMonthDayFormat(dateStr)
     .format(stringFormats.fullMonthName_MMMM)
+);
+
+export const checkIsSameDate = (initialDateValue, verificationDate, dateFormatString) => {
+  const initialDateMoment = getMomentYearMonthFormat(initialDateValue);
+  const verificationMoment = getMomentYearMonthDayFormat(verificationDate);
+  return initialDateMoment.isSame(verificationMoment, dateFormatString);
+};
+
+export const getMomentFullDateTimeFormat = dateStr => moment(dateStr, stringFormats.separateSlash_YYYY_MM_DD_HH_mm);
+
+export const checkIsBeforeMomentToMinutes = (firstEventMoment, secondEventMoment) => (
+  firstEventMoment.isBefore(secondEventMoment, stringFormats.minute)
 );
