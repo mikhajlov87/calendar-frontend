@@ -1,23 +1,63 @@
 .day, .today {
   background: #dcdcdc;
   border: 1px solid #555;
+  color: #333;
+  cursor: pointer;
   height: calc(100% / 5 - 4px);
+  overflow-y: auto;
   margin: 2px;
   width: calc(100% / 7 - 4px);
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .today {
   background: #fff;
 }
 .header {
   align-items: center;
+  background: #e8eaf6;
+  border-bottom: 1px solid #555;
   display: flex;
+  height: 30px;
   justify-content: space-between;
   padding: 5px;
 }
-.link {
-  color: #333;
+.todayHeader {
+  color: #dd2c00;
+}
+.event {
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0 3px 10px, rgba(0, 0, 0, 0.23) 0 3px 10px;
+  color: #fff;
   display: block;
-  height: 100%;
+  padding: 2px 4px;
+  margin: 2px;
+  text-align: center;
   text-decoration: none;
-  width: 100%;
+  &:active {
+    box-shadow: rgba(0, 0, 0, 0.25) 0 14px 45px, rgba(0, 0, 0, 0.22) 0 10px 18px;
+  }
+}
+.fullDayEvent {
+  background: #7986cb;
+  margin-bottom: auto;
+}
+.eventCounter {
+  background: #8bc34a;
+  color: #e8eaf6;
+}
+.hourlyEvent {
+  background: #6383a8;
+}
+.transitionalEvent {
+  background: #cddc39;
+  color: #1A237E;
+  margin-top: auto;
+}
+.dayCardBody {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 30px);
 }
