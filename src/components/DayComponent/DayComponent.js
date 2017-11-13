@@ -36,7 +36,7 @@ class DayComponent extends Component {
   );
 
   renderFullDayEvent = ({ id, eventName }) => (
-    <EventLink key={id} eventClassName={styles.fullDayEvent}>
+    <EventLink key={id} id={id} eventClassName={styles.fullDayEvent}>
       <p>{ eventName }</p>
       <p>Duration: All day</p>
     </EventLink>
@@ -53,7 +53,7 @@ class DayComponent extends Component {
   };
 
   renderHourlyDayEvent = ({ id, startTime, endTime, eventName }) => (
-    <EventLink key={id} eventClassName={styles.fullDayEvent}>
+    <EventLink key={id} id={id} eventClassName={styles.fullDayEvent}>
       <p>{ eventName }</p>
       <p>{`${startTime} - ${endTime}`}</p>
     </EventLink>
@@ -71,7 +71,7 @@ class DayComponent extends Component {
   };
 
   renderTransitionalDayEvent = ({ id, startDate, endDate, startTime, endTime, eventName }, calendarDay) => (
-    <EventLink key={id} eventClassName={styles.transitionalEvent}>
+    <EventLink key={id} id={id} eventClassName={styles.transitionalEvent}>
       <p>{ eventName }</p>
       <p>
         { (calendarDay === startDate) && (`start time ${startTime}`)}

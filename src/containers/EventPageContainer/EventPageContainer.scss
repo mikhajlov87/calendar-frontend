@@ -1,0 +1,77 @@
+.eventPage {
+  align-items: center;
+  border: 1px solid #555;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0 3px 10px, rgba(0, 0, 0, 0.23) 0 3px 10px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+}
+.eventName {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+.header {
+  font-size: 48px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.button {
+  border: 1px solid #555;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.12) 0 1px 4px;
+  outline: none;
+  min-width: 50px;
+  &:active {
+    box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px inset, rgba(0, 0, 0, 0.12) 0 1px 4px inset;
+  }
+}
+.startEvent {
+  text-align: center;
+}
+.eventHeader {
+  color: #bdbdbd;
+  font-size: 36px;
+  margin-bottom: 5px;
+}
+.dateTime {
+  font-size: 24px;
+}
+.modalHeader {
+  font-size: 24px;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+.bodyContainer {
+  align-items: center;
+  border-bottom: 1px solid #bdbdbd;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 15px;
+  min-width: 600px;
+}
+.eventCaption {
+  text-align: center;
+  padding: 15px;
+}
+.eventItem {
+  border: 1px solid #333;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.19) 0 10px 30px, rgba(0, 0, 0, 0.23) 0 6px 10px;
+  padding: 15px;
+}
+.headerContainer {
+  border-bottom: 1px solid #bdbdbd;
+  text-align: center;
+}
+.fullDayEvent {
+  align-items: center;
+  justify-content: center;
+}
