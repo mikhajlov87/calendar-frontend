@@ -31,3 +31,7 @@ export const getMomentFullDateTimeFormat = dateStr => moment(dateStr, stringForm
 export const checkIsBeforeMomentToMinutes = (firstEventMoment, secondEventMoment) => (
   firstEventMoment.isBefore(secondEventMoment, stringFormats.minute)
 );
+
+export const formatDateString = dateStr => (
+  getMomentFullDateTimeFormat(dateStr).format(stringFormats.HH_mm_MMMM_Do_YYYY)
+);

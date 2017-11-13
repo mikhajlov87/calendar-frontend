@@ -7,6 +7,7 @@ import storage from '../constants/localStorage';
 
 const initialState = {
   events: [],
+  currentEventItem: {},
   pending: false,
   error: false,
   created: false,
@@ -48,6 +49,21 @@ const events = (state = initialState, action) => {
         events: eventsList,
         pending: false,
         created: true
+      };
+    }
+    case actionTypes.GET_EVENT_ITEM_BY_ID: {
+      const currentEventItem = state.events.find(({ id }) => id === action.payload);
+      return {
+        ...state,
+        currentEventItem
+      };
+    }
+    case actionTypes.DELETE_EVENT_ITEM: {
+      const eventsList = state.events.filter(({ id }) => id !== action.payload);
+      safeItemToStorage(storage.eventsListKey, eventsList);
+      return {
+        ...state,
+        events: eventsList
       };
     }
     default:

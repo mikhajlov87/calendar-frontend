@@ -1,4 +1,5 @@
 const stringFormats = {
+  HH_mm_MMMM_Do_YYYY: 'HH:mm MMMM Do YYYY',
   separateSlash_YYYY_MM_DD_HH_mm: 'YYYY/MM/DD HH:mm',
   separateSlash_YYYY_MM_D: 'YYYY/MM/D',
   separateSlash_YYYY_MM_DD: 'YYYY/MM/DD',

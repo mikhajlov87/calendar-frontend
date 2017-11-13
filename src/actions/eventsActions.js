@@ -13,3 +13,9 @@ export const addEvent = data => (dispatch) => {
 };
 
 export const addSavedEventsListToStorage = () => ({ type: actionTypes.ADD_SAVED_EVENTS_LIST_TO_STORAGE });
+
+export const getEventItemById = eventId => ({ type: actionTypes.GET_EVENT_ITEM_BY_ID, payload: eventId });
+
+export const editEventItem = eventId => ({ type: actionTypes.EDIT_EVENT_ITEM, payload: eventId });
+
+export const deleteEventItem = eventId => ({ type: actionTypes.DELETE_EVENT_ITEM, payload: eventId });
