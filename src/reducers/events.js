@@ -52,18 +52,35 @@ const events = (state = initialState, action) => {
       };
     }
     case actionTypes.GET_EVENT_ITEM_BY_ID: {
-      const currentEventItem = state.events.find(({ id }) => id === action.payload);
+      const currentEventItem = state.events.find(({ id }) => (id === action.payload));
       return {
         ...state,
         currentEventItem
       };
     }
     case actionTypes.DELETE_EVENT_ITEM: {
-      const eventsList = state.events.filter(({ id }) => id !== action.payload);
+      const eventsList = state.events.filter(({ id }) => (id !== action.payload));
       safeItemToStorage(storage.eventsListKey, eventsList);
       return {
         ...state,
         events: eventsList
+      };
+    }
+    case actionTypes.SAVE_EVENT_CHANGES: {
+      const eventsList = state.events.filter(({ id }) => (id !== action.payload.id));
+      eventsList.push(action.payload);
+      safeItemToStorage(storage.eventsListKey, eventsList);
+      return {
+        ...state,
+        created: true,
+        events: eventsList
+      };
+    }
+    case actionTypes.CLEAR_CURRENT_EVENT_ITEM: {
+      return {
+        ...state,
+        created: false,
+        currentEventItem: {}
       };
     }
     default:

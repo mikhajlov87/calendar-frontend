@@ -1,13 +1,17 @@
+// Modules
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
+// Components
 import MonthComponent from '../../components/MonthComponent/MonthComponent';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import PageContent from '../../components/PageContent/PageContent';
-import { redirectToCurrentDate, validateYear } from '../../helpers/validate';
-import * as styles from './YearPage.scss';
+// Helpers
 import { getFullYear, getMonthsInYear, getPreviousYear, getNextYear } from '../../helpers/yearTime';
+import { redirectToCurrentDate, validateYear } from '../../helpers/validate';
+// Styles
+import * as styles from './YearPage.scss';
 
 class YearPage extends Component {
   componentWillMount() {

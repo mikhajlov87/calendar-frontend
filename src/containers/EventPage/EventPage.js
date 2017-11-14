@@ -11,18 +11,28 @@ import MessageModalBody from '../../components/MessageModalBody/MessageModalBody
 // Helpers
 import { redirectToCurrentDate } from '../../helpers/validate';
 import { parseServerError } from '../../helpers/mockRequest';
+import { checkIsEventItemExist } from '../../helpers/eventsList';
 // Actions
 import * as modalActions from '../../actions/modalActions';
+import * as eventActions from '../../actions/eventsActions';
 // Styles
 import * as styles from './EventPage.scss';
 
 class EventPage extends Component {
+
+  componentWillMount() {
+    const { eventItemId } = this.props.match.params;
+    if (eventItemId) {
+      this.verifyPermissionToEdit();
+    }
+  }
+
   componentWillReceiveProps({ eventCreated, isServerResponseError, errorStatusCode, isMessageModalOpen }) {
-    const { showMessageModal } = this.props.modalActions;
-    const { history, currentDate } = this.props;
+    const { modalActions: { showMessageModal }, history, currentDate, match: { params: { eventItemId } } } = this.props;
 
     if (eventCreated && eventCreated !== this.props.eventCreated) {
-      const modalBody = this.renderMessageModalBody('success', 'event was created!');
+      const message = (eventItemId) ? 'updated' : 'created';
+      const modalBody = this.renderMessageModalBody('success', `event was ${message}!`);
       showMessageModal(modalBody);
     }
 
@@ -37,6 +47,17 @@ class EventPage extends Component {
     }
   }
 
+  verifyPermissionToEdit = () => {
+    const { eventActions: { getEventItemById }, eventsList, history, currentDate } = this.props;
+    const { eventItemId } = this.props.match.params;
+    const isEventItemExist = checkIsEventItemExist(eventsList, eventItemId);
+    if (isEventItemExist) {
+      getEventItemById(eventItemId);
+    } else {
+      redirectToCurrentDate(history, currentDate);
+    }
+  };
+
   renderMessageModalBody = (status, message) => {
     const { hideMessageModal } = this.props.modalActions;
     return (
@@ -50,10 +71,12 @@ class EventPage extends Component {
   };
 
   render() {
-    const { edit } = this.props.match.params;
+    const { eventItemId } = this.props.match.params;
     return (
       <div className={styles.eventPage}>
-        <h2 className={styles.pageHeader}>{ edit ? 'Edit Event:' : 'Create Event:' }</h2>
+        <h2 className={styles.pageHeader}>
+          { eventItemId ? 'Edit Event:' : 'Create Event:' }
+        </h2>
         <EventForm />
       </div>
     );
@@ -67,7 +90,9 @@ EventPage.propTypes = {
   isMessageModalOpen: PropTypes.bool,
   isServerResponseError: PropTypes.bool,
   eventCreated: PropTypes.bool,
-  currentDate: PropTypes.string
+  currentDate: PropTypes.string,
+  eventsList: PropTypes.array,
+  eventActions: PropTypes.object
 };
 
 const mapStateToProps = state => ({
@@ -75,11 +100,13 @@ const mapStateToProps = state => ({
   isServerResponseError: state.events.error,
   eventCreated: state.events.created,
   errorStatusCode: state.events.errorText,
-  currentDate: state.currentDate.date
+  currentDate: state.currentDate.date,
+  eventsList: state.events.events
 });
 
 const mapDispatchToProps = dispatch => ({
-  modalActions: bindActionCreators(modalActions, dispatch)
+  modalActions: bindActionCreators(modalActions, dispatch),
+  eventActions: bindActionCreators(eventActions, dispatch)
 });
 
 export default withRouter(

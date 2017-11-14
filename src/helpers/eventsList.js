@@ -29,3 +29,5 @@ export const checkIsBetweenMoment = (currentDate, { startDate, endDate }) => {
   const endDateMoment = moment(endDate, supportedDateStringFormats);
   return currentDateMoment.isBetween(startDateMoment, endDateMoment, null, '[]');
 };
+
+export const checkIsEventItemExist = (eventsList, eventItemId) => eventsList.some(({ id }) => (eventItemId === id));

@@ -1,6 +1,8 @@
+// Modules
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+// Styles
 import * as styles from './PageHeader.scss';
 
 const PageHeader = props => (
@@ -9,7 +11,7 @@ const PageHeader = props => (
     <span className={styles.title}>
       { props.children }
     </span>
-    <Link className={styles.button} to="/event">add event</Link>
+    <Link className={styles.button} to="/create-event">add event</Link>
     <Link className={styles.button} to={`/${props.next}`}>{props.rightButtonTitle}</Link>
   </header>
 );
