@@ -19,3 +19,7 @@ export const getEventItemById = eventId => ({ type: actionTypes.GET_EVENT_ITEM_B
 export const editEventItem = eventId => ({ type: actionTypes.EDIT_EVENT_ITEM, payload: eventId });
 
 export const deleteEventItem = eventId => ({ type: actionTypes.DELETE_EVENT_ITEM, payload: eventId });
+
+export const saveEventChanges = eventObject => ({ type: actionTypes.SAVE_EVENT_CHANGES, payload: eventObject });
+
+export const clearCurrentEventItem = () => ({ type: actionTypes.CLEAR_CURRENT_EVENT_ITEM });

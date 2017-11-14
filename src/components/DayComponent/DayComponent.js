@@ -47,13 +47,13 @@ class DayComponent extends Component {
     const fullDayEventsLength = fullDayEvents.length;
     return (
       (fullDayEventsLength > 1)
-        ? (this.renderEventsCounter(fullDayEventsLength))
+        ? (this.renderEventsCounter(fullDayEventsLength, styles.fullDayEvent))
         : (fullDayEvents.map(this.renderFullDayEvent))
     );
   };
 
   renderHourlyDayEvent = ({ id, startTime, endTime, eventName }) => (
-    <EventLink key={id} id={id} eventClassName={styles.fullDayEvent}>
+    <EventLink key={id} id={id} eventClassName={styles.hourlyEvent}>
       <p>{ eventName }</p>
       <p>{`${startTime} - ${endTime}`}</p>
     </EventLink>

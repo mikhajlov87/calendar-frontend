@@ -15,21 +15,25 @@ import { redirectToCurrentDate } from '../../helpers/validate';
 import * as eventsActions from '../../actions/eventsActions';
 import * as modalActions from '../../actions/modalActions';
 // Styles
-import * as styles from './EventPageContainer.scss';
+import * as styles from './ViewEventPage.scss';
 
-class EventPageContainer extends Component {
+class ViewEventPage extends Component {
 
   componentWillMount() {
-    const { id } = this.props.match.params;
-    const { getEventItemById } = this.props.eventsActions;
-    getEventItemById(id);
+    const { eventsActions: { getEventItemById }, match: { params: { eventItemId } } } = this.props;
+    getEventItemById(eventItemId);
+  }
+
+  componentWillUnmount() {
+    const { clearCurrentEventItem } = this.props.eventsActions;
+    clearCurrentEventItem();
   }
 
   handleSuccessDeleteEvent = () => {
     const { eventsActions: { deleteEventItem }, modalActions: { showMessageModal } } = this.props;
+    const { eventItemId } = this.props.match.params;
     const modalBodyDeleteEventSuccessMessage = this.renderModalBodyDeleteEventSuccessMessage();
-    const { id } = this.props.match.params;
-    deleteEventItem(id);
+    deleteEventItem(eventItemId);
     showMessageModal(modalBodyDeleteEventSuccessMessage);
   };
 
@@ -41,8 +45,8 @@ class EventPageContainer extends Component {
 
   redirectToEditEventPage = () => {
     const { history, modalActions: { hideMessageModal } } = this.props;
-    const { id } = this.props.match.params;
-    const editEventPageUrl = `event/${id}`;
+    const { eventItemId } = this.props.match.params;
+    const editEventPageUrl = `edit-event/${eventItemId}`;
     hideMessageModal();
     redirectToCurrentDate(history, editEventPageUrl);
   };
@@ -173,7 +177,7 @@ class EventPageContainer extends Component {
   }
 }
 
-EventPageContainer.propTypes = {
+ViewEventPage.propTypes = {
   match: PropTypes.object,
   eventsActions: PropTypes.object,
   modalActions: PropTypes.object,
@@ -192,4 +196,6 @@ const mapDispatchToProps = dispatch => ({
   modalActions: bindActionCreators(modalActions, dispatch)
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(EventPageContainer));
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(ViewEventPage)
+);

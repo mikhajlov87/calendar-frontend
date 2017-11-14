@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Field, reduxForm, formValueSelector } from 'redux-form';
+import { withRouter } from 'react-router-dom';
 // Components
 import DateField from '../../components/DateField/DateField';
 import TimeField from '../../components/TimeField/TimeField';
@@ -17,7 +18,7 @@ import { validate } from '../../helpers/formValidation';
 import formFieldsProps from './config';
 // Actions
 import * as modalActions from '../../actions/modalActions';
-import * as formActions from '../../actions/eventsActions';
+import * as eventActions from '../../actions/eventsActions';
 // Styles
 import * as styles from './EventForm.scss';
 
@@ -28,19 +29,26 @@ class EventForm extends Component {
       formData: null
     };
   }
+
   confirmSubmitting = (formData) => {
-    const modalBody = this.renderBodyConfirmModal();
-    const { showMessageModal } = this.props.modalActions;
+    const { modalActions: { showMessageModal }, match: { params: { eventItemId } } } = this.props;
+    const modalMessage = (eventItemId) ? (this.renderConfirmSaveChangesModalBody()) : (this.renderBodyConfirmModal());
     this.setState({ formData });
-    showMessageModal(modalBody);
+    showMessageModal(modalMessage);
   };
 
   createEvent = () => {
     const { formData } = this.state;
-    const { addEvent } = this.props.formActions;
-    const { hideMessageModal } = this.props.modalActions;
+    const { eventActions: { addEvent }, modalActions: { hideMessageModal } } = this.props;
     hideMessageModal();
     addEvent(formData);
+  };
+
+  saveChanges = () => {
+    const { formData } = this.state;
+    const { eventActions: { saveEventChanges }, initialValues: { id } } = this.props;
+    const eventObject = { ...formData, id };
+    saveEventChanges(eventObject);
   };
 
   abortCreatingEvent = () => {
@@ -49,13 +57,24 @@ class EventForm extends Component {
     hideMessageModal();
   };
 
+  renderConfirmSaveChangesModalBody = () => (
+    <ModalConfirmBody
+      rejected={this.abortCreatingEvent}
+      accepted={this.saveChanges}
+      rejectButtonLabel="cancel"
+      acceptButtonLabel="save changes"
+      modalHeader="Your are confirm SAVE changes?"
+      modalBody="...and add it into the your Calendar"
+    />
+  );
+
   renderBodyConfirmModal = () => (
     <ModalConfirmBody
       rejected={this.abortCreatingEvent}
       accepted={this.createEvent}
       rejectButtonLabel="cancel"
       acceptButtonLabel="accept"
-      modalHeader="Your are confirm create Event?"
+      modalHeader="Your are confirm CREATE Event?"
       modalBody="...and add it into the your Calendar"
     />
   );
@@ -133,13 +152,15 @@ class EventForm extends Component {
 }
 
 EventForm.propTypes = {
-  formActions: PropTypes.object,
+  eventActions: PropTypes.object,
   modalActions: PropTypes.object,
   handleSubmit: PropTypes.func,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
   reset: PropTypes.func,
-  isFullDayValue: PropTypes.bool
+  isFullDayValue: PropTypes.bool,
+  initialValues: PropTypes.object,
+  match: PropTypes.object
 };
 
 const selector = formValueSelector('EventForm');
@@ -148,12 +169,13 @@ const mapStateToProps = (state) => {
   const isFullDayValue = selector(state, 'isFullDay');
   return {
     form: state.reduxForm,
-    isFullDayValue
+    isFullDayValue,
+    initialValues: state.events.currentEventItem
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  formActions: bindActionCreators(formActions, dispatch),
+  eventActions: bindActionCreators(eventActions, dispatch),
   modalActions: bindActionCreators(modalActions, dispatch)
 });
 
@@ -163,4 +185,4 @@ export default connect(
 )(reduxForm({
   form: 'EventForm',
   validate
-})(EventForm));
+})(withRouter(EventForm)));

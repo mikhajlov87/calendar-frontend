@@ -1,13 +1,17 @@
+// Modules
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+// Components
 import PageHeader from '../../components/PageHeader/PageHeader';
 import PageContent from '../../components/PageContent/PageContent';
 import HourComponent from '../../components/Hour/HourComponent';
+// Helpers
 import { getMonthName, getDateStringFormatYearMonthDay } from '../../helpers/momentTime';
 import { getNextDay, getDayNumber, getPreviousDay, getDayHoursArr } from '../../helpers/dayTime';
 import { validateDate, redirectToCurrentDate } from '../../helpers/validate';
+// Styles
 import * as styles from './DayPage.scss';
 
 class DayPage extends Component {
@@ -28,7 +32,6 @@ class DayPage extends Component {
     );
   };
   render() {
-    console.log(this);
     const { year, month, day } = this.props.params;
     const dateStr = getDateStringFormatYearMonthDay({ year, month, day });
     return (
