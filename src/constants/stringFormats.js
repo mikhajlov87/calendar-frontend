@@ -17,7 +17,8 @@ const stringFormats = {
   month: 'month',
   days: 'days',
   day: 'day',
-  minute: 'minute'
+  minute: 'minute',
+  HH_mm: 'HH:mm'
 };
 
 export const supportedDateStringFormats = [
@@ -27,6 +28,15 @@ export const supportedDateStringFormats = [
   'YYYY MM DD',
   'YYYY-MM-D',
   'YYYY-MM-DD'
+];
+
+export const supportedDateTimeStringFormats = [
+  'YYYY/MM/D HH:mm',
+  'YYYY/MM/DD HH:mm',
+  'YYYY MM D HH:mm',
+  'YYYY MM DD HH:mm',
+  'YYYY-MM-D HH:mm',
+  'YYYY-MM-DD HH:mm'
 ];
 
 export default stringFormats;

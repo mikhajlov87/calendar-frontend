@@ -1,4 +1,4 @@
-const mockRequest = data => new Promise((resolve, reject) => {
+const mockRequest = (data, delay = 500) => new Promise((resolve, reject) => {
   const random = () => Math.round(Math.random() * 10);
   setTimeout(() => {
     const serverResponse = random();
@@ -7,7 +7,7 @@ const mockRequest = data => new Promise((resolve, reject) => {
     } else {
       reject(new Error(serverResponse));
     }
-  }, 500);
+  }, delay);
 });
 
 export const parseServerError = (errorText) => {

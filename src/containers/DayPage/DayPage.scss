@@ -1,4 +1,68 @@
+$transitionalEventsBackgroundColor: #1a237e;
+$transitionalEventsColor: #cddc39;
+$hourlyEventsBackgroundColor: #6383a8;
 .day {
   border-radius: 4px;
   height: 100%;
+}
+.eventsContainer {
+  align-items: center;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.eventWrapper {
+  display: flex;
+  height: 26px;
+  padding: 2px 0;
+  text-decoration: none;
+  width: 100%;
+}
+.eventItem {
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  height: 22px;
+  line-height: 22px;
+  overflow: hidden;
+  padding: 0 8px;
+  width: 100%;
+}
+.fullDayEvents {
+  background: #7986cb;
+  color: #333;
+}
+.hourlyEvents {
+  background: $hourlyEventsBackgroundColor;
+  display: flex;
+}
+.transitionalEvents {
+  background: $transitionalEventsBackgroundColor;
+  color: $transitionalEventsColor;
+  display: flex;
+  justify-content: space-between;
+}
+.corner {
+  width:0;
+  height:0;
+  border: 11px solid transparent;
+}
+.leftCorner {
+  border-right-color: $transitionalEventsBackgroundColor;
+  border-left: 0;
+  margin-right: -1px;
+}
+.rightCorner {
+  border-right: 0;
+  border-left-color: $transitionalEventsBackgroundColor;
+  margin-left: -1px;
+}
+.endTimeHourlyEvent {
+  color: #333;
+}
+.hourlyEventName {
+  margin: 0 auto;
 }

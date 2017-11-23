@@ -7,7 +7,7 @@ import cx from 'classnames';
 import EventLink from '../EventLink/EventLink';
 // Helpers
 import { redirectToCurrentDate } from '../../helpers/validate';
-import { compareEvents } from '../../helpers/eventsList';
+import { mapInstanceToArray } from '../../helpers/calendarEvents';
 // Styles
 import * as styles from './DayComponent.scss';
 
@@ -44,11 +44,11 @@ class DayComponent extends Component {
 
   renderFullDayEvents = () => {
     const { fullDayEvents } = this.props;
-    const fullDayEventsLength = fullDayEvents.length;
+    const fullDayEventsLength = fullDayEvents.size;
     return (
       (fullDayEventsLength > 1)
         ? (this.renderEventsCounter(fullDayEventsLength, styles.fullDayEvent))
-        : (fullDayEvents.map(this.renderFullDayEvent))
+        : (mapInstanceToArray(fullDayEvents).map(this.renderFullDayEvent))
     );
   };
 
@@ -61,12 +61,11 @@ class DayComponent extends Component {
 
   renderHourlyDayEvents = () => {
     const { hourlyEvents } = this.props;
-    const hourlyEventsLength = hourlyEvents.length;
-    const sortedHourlyEventsArr = hourlyEvents.sort(compareEvents);
+    const hourlyEventsLength = hourlyEvents.size;
     return (
       (hourlyEventsLength > 1)
         ? (this.renderEventsCounter(hourlyEventsLength, styles.hourlyEvent))
-        : (sortedHourlyEventsArr.map(this.renderHourlyDayEvent))
+        : (mapInstanceToArray(hourlyEvents).map(this.renderHourlyDayEvent))
     );
   };
 
@@ -83,11 +82,13 @@ class DayComponent extends Component {
 
   renderTransitionalDayEvents = () => {
     const { transitionalEvents, calendarDay } = this.props;
-    const transitionalEventsLength = transitionalEvents.length;
+    const transitionalEventsLength = transitionalEvents.size;
     return (
       (transitionalEventsLength > 1)
       ? (this.renderEventsCounter(transitionalEventsLength, styles.transitionalEvent))
-      : (transitionalEvents.map(eventItem => this.renderTransitionalDayEvent(eventItem, calendarDay)))
+      : (mapInstanceToArray(transitionalEvents)
+          .map(eventItem => this.renderTransitionalDayEvent(eventItem, calendarDay))
+        )
     );
   };
 
@@ -116,9 +117,9 @@ DayComponent.propTypes = {
   match: PropTypes.object,
   isCurrentDay: PropTypes.bool,
   history: PropTypes.object,
-  fullDayEvents: PropTypes.array,
-  hourlyEvents: PropTypes.array,
-  transitionalEvents: PropTypes.array,
+  fullDayEvents: PropTypes.object,
+  hourlyEvents: PropTypes.object,
+  transitionalEvents: PropTypes.object,
   calendarDay: PropTypes.string
 };
 

@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { RingLoader } from 'react-spinners';
 // Components
 import ButtonDefault from '../../components/ButtonDefault/ButtonDefault';
 import ButtonSuccess from '../../components/ButtonSuccess/ButtonSuccess';
@@ -24,17 +25,47 @@ class ViewEventPage extends Component {
     getEventItemById(eventItemId);
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { modalActions: { showMessageModal } } = this.props;
+    const {
+      eventItemDeleted, deleteEventItemError, deleteEventItemPending,
+      editEventItemPending, editEventItemFulfilled, editEventItemRejected
+    } = nextProps;
+
+    if (deleteEventItemPending && (deleteEventItemPending !== this.props.deleteEventItemPending)) {
+      showMessageModal(this.renderModalBodyWithPreloader());
+    }
+
+    if (eventItemDeleted && (eventItemDeleted !== this.props.eventItemDeleted)) {
+      showMessageModal(this.renderDeleteEventSuccessMessage());
+    }
+
+    if (deleteEventItemError && (deleteEventItemError !== this.props.deleteEventItemError)) {
+      showMessageModal(this.renderDeleteEventErrorMessage());
+    }
+
+    if (editEventItemPending && (editEventItemPending !== this.props.editEventItemPending)) {
+      showMessageModal(this.renderModalBodyWithPreloader());
+    }
+
+    if (editEventItemFulfilled && (editEventItemFulfilled !== this.props.editEventItemFulfilled)) {
+      this.redirectToEditEventPage();
+    }
+
+    if (editEventItemRejected && (editEventItemRejected !== this.props.editEventItemRejected)) {
+      showMessageModal(this.renderEditEventServerErrorMessageModal());
+    }
+  }
+
   componentWillUnmount() {
     const { clearCurrentEventItem } = this.props.eventsActions;
     clearCurrentEventItem();
   }
 
   handleSuccessDeleteEvent = () => {
-    const { eventsActions: { deleteEventItem }, modalActions: { showMessageModal } } = this.props;
+    const { eventsActions: { deleteEventItemRequest } } = this.props;
     const { eventItemId } = this.props.match.params;
-    const modalBodyDeleteEventSuccessMessage = this.renderModalBodyDeleteEventSuccessMessage();
-    deleteEventItem(eventItemId);
-    showMessageModal(modalBodyDeleteEventSuccessMessage);
+    deleteEventItemRequest(eventItemId);
   };
 
   redirectToMonthPage = () => {
@@ -51,22 +82,52 @@ class ViewEventPage extends Component {
     redirectToCurrentDate(history, editEventPageUrl);
   };
 
-  renderModalBodyDeleteEventSuccessMessage = () => (
+  renderModalBodyWithPreloader = () => (
+    <div className={styles.modalPreloader}>
+      <RingLoader loading />
+    </div>
+  );
+
+  renderDeleteEventSuccessMessage = () => (
     <div>
-      <div className={styles.modalHeader}>event item was deleted</div>
+      <div className={styles.modalHeader}>Delete event item was successfully</div>
       <ButtonSuccess onClick={this.redirectToMonthPage}>
         Redirect to month page
       </ButtonSuccess>
     </div>
   );
 
-  renderConfirmEditModalBodyMessage = () => {
+  renderEditEventServerErrorMessageModal = () => {
     const { hideMessageModal } = this.props.modalActions;
+    return (
+      <div>
+        <div className={styles.modalHeader}>Server Error! Please try again</div>
+        <ButtonSuccess onClick={hideMessageModal}>
+          Close modal
+        </ButtonSuccess>
+      </div>
+    );
+  };
+
+  renderDeleteEventErrorMessage = () => {
+    const { modalActions: { hideMessageModal } } = this.props;
+    return (
+      <div>
+        <div className={styles.modalHeader}>Server Error! Event item was not deleted!</div>
+        <ButtonSuccess onClick={hideMessageModal}>
+          Close modal
+        </ButtonSuccess>
+      </div>
+    );
+  };
+
+  renderConfirmEditModalBodyMessage = () => {
+    const { modalActions: { hideMessageModal }, eventsActions: { editEventItemRequest } } = this.props;
     return (
       <div>
         <div className={styles.modalHeader}>you confirm EDIT event?</div>
         <div>
-          <ButtonSuccess onClick={this.redirectToEditEventPage}>edit event</ButtonSuccess>
+          <ButtonSuccess onClick={editEventItemRequest}>edit event</ButtonSuccess>
           <ButtonDefault onClick={hideMessageModal}>close modal</ButtonDefault>
         </div>
       </div>
@@ -107,14 +168,14 @@ class ViewEventPage extends Component {
     return (
       <div className={styles.startEvent}>
         {
-          isFullDay
-            ? <div>That event is full day</div>
-            : startTime && (
+          (isFullDay)
+            ? (<div>That event is full day</div>)
+            : (startTime && (
               <div>
-                <h2 className={styles.eventHeader}>Start event:</h2>
+                <h2 className={styles.eventHeader}>Start:</h2>
                 <p className={styles.dateTime}>{ formattedDate }</p>
               </div>
-            )
+            ))
         }
       </div>
     );
@@ -126,9 +187,9 @@ class ViewEventPage extends Component {
     return (
       <div className={styles.startEvent}>
         {
-          !isFullDay && endTime && (
+          (!isFullDay && endTime) && (
             <div>
-              <h2 className={styles.eventHeader}>End event:</h2>
+              <h2 className={styles.eventHeader}>End:</h2>
               <p className={styles.dateTime}>{ formattedDate }</p>
             </div>
           )
@@ -141,15 +202,15 @@ class ViewEventPage extends Component {
     const { eventCaption } = this.props.currentEventItem;
     return (
       <div className={styles.eventCaption}>
-        <h2 className={styles.eventHeader}>Event caption:</h2>
-        { eventCaption || 'That event has no caption' }
+        <h2 className={styles.eventHeader}>Description:</h2>
+        { eventCaption || 'That event has no description' }
       </div>
     );
   };
 
   renderEventItemHeader = () => (
     <div className={styles.headerContainer}>
-      <h2 className={styles.eventHeader}>Event name:</h2>
+      <h2 className={styles.eventHeader}>Name:</h2>
       { this.renderEventName() }
     </div>
   );
@@ -183,12 +244,24 @@ ViewEventPage.propTypes = {
   modalActions: PropTypes.object,
   currentEventItem: PropTypes.object,
   history: PropTypes.object,
-  currentDate: PropTypes.string
+  currentDate: PropTypes.string,
+  eventItemDeleted: PropTypes.bool,
+  deleteEventItemError: PropTypes.bool,
+  deleteEventItemPending: PropTypes.bool,
+  editEventItemPending: PropTypes.bool,
+  editEventItemFulfilled: PropTypes.bool,
+  editEventItemRejected: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
   currentEventItem: state.events.currentEventItem,
-  currentDate: state.currentDate.date
+  currentDate: state.currentDate.date,
+  deleteEventItemError: state.events.deleteEventItemError,
+  eventItemDeleted: state.events.eventItemDeleted,
+  deleteEventItemPending: state.events.deleteEventItemPending,
+  editEventItemPending: state.events.editEventItemPending,
+  editEventItemFulfilled: state.events.editEventItemFulfilled,
+  editEventItemRejected: state.events.editEventItemRejected
 });
 
 const mapDispatchToProps = dispatch => ({

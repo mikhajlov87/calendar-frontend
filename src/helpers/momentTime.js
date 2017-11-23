@@ -1,7 +1,7 @@
 // Modules
 import moment from 'moment';
 // Constants
-import stringFormats from '../constants/stringFormats';
+import stringFormats, { supportedDateTimeStringFormats } from '../constants/stringFormats';
 
 export const getMoment = () => moment();
 
@@ -20,18 +20,30 @@ export const getMonthName = dateStr => (
     .format(stringFormats.fullMonthName_MMMM)
 );
 
-export const checkIsSameDate = (initialDateValue, verificationDate, dateFormatString) => {
-  const initialDateMoment = getMomentYearMonthFormat(initialDateValue);
-  const verificationMoment = getMomentYearMonthDayFormat(verificationDate);
-  return initialDateMoment.isSame(verificationMoment, dateFormatString);
-};
-
 export const getMomentFullDateTimeFormat = dateStr => moment(dateStr, stringFormats.separateSlash_YYYY_MM_DD_HH_mm);
-
-export const checkIsBeforeMomentToMinutes = (firstEventMoment, secondEventMoment) => (
-  firstEventMoment.isBefore(secondEventMoment, stringFormats.minute)
-);
 
 export const formatDateString = dateStr => (
   getMomentFullDateTimeFormat(dateStr).format(stringFormats.HH_mm_MMMM_Do_YYYY)
 );
+
+export const convertMomentObjToYearMonthDayFormat = momentObj => (
+  momentObj.format(stringFormats.separateSlash_YYYY_MM_DD)
+);
+
+export const convertMomentObjToHHmmFormat = momentObj => momentObj.format(stringFormats.HH_mm);
+
+export const getMomentFromDateTimeString = dateTimeString => moment(dateTimeString, supportedDateTimeStringFormats);
+
+export const checkMomentObjectsIsSameDay = (startMomentObj, endMomentObj) => (
+  startMomentObj.isSame(endMomentObj, stringFormats.day)
+);
+
+export const checkMomentObjectsIsAfterDay = (startMomentObj, endMomentObj) => (
+  endMomentObj.isAfter(startMomentObj, stringFormats.day)
+);
+
+export const convertMomentObjToISOString = momentObj => momentObj.toISOString();
+
+export const getMomentByISOString = ISOString => moment(ISOString);
+
+export const getNextDayMoment = prevDayMoment => prevDayMoment.add(1, stringFormats.day);
