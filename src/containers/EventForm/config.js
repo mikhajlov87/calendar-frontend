@@ -39,7 +39,8 @@ const formFieldsProps = {
   },
   eventCaption: {
     name: 'eventCaption',
-    placeholder: 'event caption'
+    placeholder: 'event caption',
+    label: 'description'
   },
   createEventConfirmModal: {
     modalHeader: 'You are confirm create event?',

@@ -12,10 +12,10 @@ import DayComponent from '../../components/DayComponent/DayComponent';
 import * as pageActions from '../../actions';
 // Helpers
 import { getDateStringFormatYearMonth } from '../../helpers/momentTime';
-import { getPreviousMonth, getNextMonth, getMonthDaysArr, getMonthName, sortEvents } from '../../helpers/monthTime';
+import { getPreviousMonth, getNextMonth, getMonthDaysArr, getMonthName } from '../../helpers/monthTime';
 import { redirectToCurrentDate, validateYearMonth } from '../../helpers/validate';
 import { getFullYear } from '../../helpers/yearTime';
-import { findMonthEvents, checkIsBetweenMoment } from '../../helpers/eventsList';
+import { DayEventObj } from '../../helpers/calendarEvents';
 // Styles
 import * as styles from './MonthPage.scss';
 
@@ -29,11 +29,9 @@ class MonthPage extends Component {
     }
   }
 
-  renderDayComponent = (monthDay, { hourlyEvents, fullDayEvents, transitionalEvents }) => {
-    const { key, isCurrentDay, calendarDay, weekday, day } = monthDay;
-    const hourlyEventsArr = hourlyEvents.filter(({ startDate }) => startDate === calendarDay);
-    const fullDayEventsArr = fullDayEvents.filter(({ startDate }) => startDate === calendarDay);
-    const transitionalEventsArr = transitionalEvents.filter(eventItem => checkIsBetweenMoment(calendarDay, eventItem));
+  renderDayComponent = ({ key, isCurrentDay, calendarDay, weekday, day }) => {
+    const { dayEvents } = this.props;
+    const { fullDayEvents, hourlyEvents, transitionalEvents } = dayEvents.get(calendarDay) || new DayEventObj();
     return (
       <DayComponent
         key={key}
@@ -41,19 +39,16 @@ class MonthPage extends Component {
         day={day}
         weekday={weekday}
         calendarDay={calendarDay}
-        hourlyEvents={hourlyEventsArr}
-        fullDayEvents={fullDayEventsArr}
-        transitionalEvents={transitionalEventsArr}
+        hourlyEvents={hourlyEvents}
+        fullDayEvents={fullDayEvents}
+        transitionalEvents={transitionalEvents}
       />
     );
   };
 
   renderDaysInMonth = (dateStr) => {
-    const { eventsList } = this.props;
     const monthDaysArr = getMonthDaysArr(dateStr);
-    const monthEventsList = findMonthEvents(eventsList, dateStr);
-    const sortedEvents = sortEvents(monthEventsList);
-    return monthDaysArr.map(eventItem => this.renderDayComponent(eventItem, sortedEvents));
+    return monthDaysArr.map(dayItem => this.renderDayComponent(dayItem));
   };
 
   renderPageHeader = dateStr => (
@@ -83,12 +78,13 @@ MonthPage.propTypes = {
   params: PropTypes.object,
   history: PropTypes.object,
   date: PropTypes.string,
-  eventsList: PropTypes.array
+  dayEvents: PropTypes.object
 };
 
 const mapStateToProps = state => ({
   date: state.currentDate.date,
-  eventsList: state.events.events
+  eventsList: state.events.events,
+  dayEvents: state.events.calendarDayEvents
 });
 
 const mapDispatchToProps = dispatch => ({

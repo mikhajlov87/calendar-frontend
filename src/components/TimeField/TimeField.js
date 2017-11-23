@@ -1,15 +1,17 @@
+// Modules
 import React from 'react';
 import PropTypes from 'prop-types';
 import TimeInput from 'react-time-input';
 import cx from 'classnames';
+// Styles
 import * as styles from './TimeField.scss';
 
-const TimeField = ({ input, initTime, placeholder, type, label, meta: { touched, error, warning } }) => (
+const TimeField = ({ input, placeholder, type, label, meta: { touched, error, warning } }) => (
   <div className={cx(styles.formField, { [styles.notValid]: (touched && error) })}>
     { !!label && (<label htmlFor={input.name} className={styles.formLabel}>{ label }</label>) }
     <TimeInput
       {...input}
-      initTime={initTime}
+      initTime={input.value}
       type={type}
       placeholder={placeholder}
       className={styles.formControl}
@@ -29,7 +31,6 @@ const TimeField = ({ input, initTime, placeholder, type, label, meta: { touched,
 );
 
 TimeField.propTypes = {
-  initTime: PropTypes.string,
   input: PropTypes.object,
   label: PropTypes.string,
   meta: PropTypes.object,

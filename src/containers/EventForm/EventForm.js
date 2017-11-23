@@ -23,12 +23,8 @@ import * as eventActions from '../../actions/eventsActions';
 import * as styles from './EventForm.scss';
 
 class EventForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      formData: null
-    };
-  }
+
+  state = { formData: null };
 
   confirmSubmitting = (formData) => {
     const { modalActions: { showMessageModal }, match: { params: { eventItemId } } } = this.props;
@@ -39,16 +35,15 @@ class EventForm extends Component {
 
   createEvent = () => {
     const { formData } = this.state;
-    const { eventActions: { addEvent }, modalActions: { hideMessageModal } } = this.props;
-    hideMessageModal();
-    addEvent(formData);
+    const { eventActions: { addEventRequest } } = this.props;
+    addEventRequest(formData);
   };
 
   saveChanges = () => {
     const { formData } = this.state;
-    const { eventActions: { saveEventChanges }, initialValues: { id } } = this.props;
+    const { eventActions: { saveEventChangesRequest }, initialValues: { id } } = this.props;
     const eventObject = { ...formData, id };
-    saveEventChanges(eventObject);
+    saveEventChangesRequest(eventObject);
   };
 
   abortCreatingEvent = () => {
@@ -79,7 +74,7 @@ class EventForm extends Component {
     />
   );
 
-  renderFormField = ({ label, name, placeholder, stringFormat }, component) => (
+  renderFormField = ({ label, name, placeholder, stringFormat, initTime }, component) => (
     <Field
       id={name}
       label={label}
@@ -88,6 +83,7 @@ class EventForm extends Component {
       type="text"
       placeholder={placeholder}
       {...stringFormat}
+      {...initTime}
     />
   );
 
