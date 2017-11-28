@@ -1,7 +1,9 @@
+// Modules
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link, withRouter } from 'react-router-dom';
 import cx from 'classnames';
+// Styles
 import * as styles from './MonthComponent.scss';
 
 const MonthComponent = props => (

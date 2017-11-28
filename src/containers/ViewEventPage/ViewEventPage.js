@@ -10,50 +10,64 @@ import { RingLoader } from 'react-spinners';
 import ButtonDefault from '../../components/ButtonDefault/ButtonDefault';
 import ButtonSuccess from '../../components/ButtonSuccess/ButtonSuccess';
 // Helpers
-import { formatDateString } from '../../helpers/momentTime';
-import { redirectToCurrentDate } from '../../helpers/validate';
+import { formatDateString } from '../../helpers/moment';
+import { redirectToCurrentDate } from '../../helpers/validation/validate';
 // Actions
-import * as eventsActions from '../../actions/eventsActions';
-import * as modalActions from '../../actions/modalActions';
+import { eventsActions, modalsActions } from './actions';
 // Styles
 import * as styles from './ViewEventPage.scss';
 
 class ViewEventPage extends Component {
-
   componentWillMount() {
-    const { eventsActions: { getEventItemById }, match: { params: { eventItemId } } } = this.props;
+    const { getEventItemById } = this.props.eventsActions;
+    const { eventItemId } = this.props.match.params;
     getEventItemById(eventItemId);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { modalActions: { showMessageModal } } = this.props;
-    const {
-      eventItemDeleted, deleteEventItemError, deleteEventItemPending,
-      editEventItemPending, editEventItemFulfilled, editEventItemRejected
-    } = nextProps;
+    const deleteEventItemPending = (
+      nextProps.deleteEventItemPending && (nextProps.deleteEventItemPending !== this.props.deleteEventItemPending)
+    );
 
-    if (deleteEventItemPending && (deleteEventItemPending !== this.props.deleteEventItemPending)) {
-      showMessageModal(this.renderModalBodyWithPreloader());
+    const editEventItemPending = (
+      nextProps.editEventItemPending && (nextProps.editEventItemPending !== this.props.editEventItemPending)
+    );
+
+    const eventItemDeletedSuccessfully = (
+      nextProps.eventItemDeleted && (nextProps.eventItemDeleted !== this.props.eventItemDeleted)
+    );
+
+    const deleteEventItemRejected = (
+      nextProps.deleteEventItemError && (nextProps.deleteEventItemError !== this.props.deleteEventItemError)
+    );
+
+    const editEventItemSuccessfully = (
+      nextProps.editEventItemFulfilled && (nextProps.editEventItemFulfilled !== this.props.editEventItemFulfilled)
+    );
+
+    const editEventItemRejected = (
+      nextProps.editEventItemRejected && (nextProps.editEventItemRejected !== this.props.editEventItemRejected)
+    );
+
+    if (deleteEventItemPending || editEventItemPending) {
+      this.showMessageModal(this.renderModalBodyWithPreloader());
     }
 
-    if (eventItemDeleted && (eventItemDeleted !== this.props.eventItemDeleted)) {
-      showMessageModal(this.renderDeleteEventSuccessMessage());
+    if (eventItemDeletedSuccessfully) {
+      this.showMessageModal(this.renderDeleteEventSuccessMessage());
     }
 
-    if (deleteEventItemError && (deleteEventItemError !== this.props.deleteEventItemError)) {
-      showMessageModal(this.renderDeleteEventErrorMessage());
+    if (deleteEventItemRejected || editEventItemRejected) {
+      const message = (
+        (deleteEventItemRejected)
+          ? ('Server Error! Event item was not deleted!')
+          : ('Server Error! Please try again')
+      );
+      this.showMessageModal(this.renderModalBodyWithMessage(message));
     }
 
-    if (editEventItemPending && (editEventItemPending !== this.props.editEventItemPending)) {
-      showMessageModal(this.renderModalBodyWithPreloader());
-    }
-
-    if (editEventItemFulfilled && (editEventItemFulfilled !== this.props.editEventItemFulfilled)) {
+    if (editEventItemSuccessfully) {
       this.redirectToEditEventPage();
-    }
-
-    if (editEventItemRejected && (editEventItemRejected !== this.props.editEventItemRejected)) {
-      showMessageModal(this.renderEditEventServerErrorMessageModal());
     }
   }
 
@@ -62,23 +76,33 @@ class ViewEventPage extends Component {
     clearCurrentEventItem();
   }
 
+  showMessageModal = (message) => {
+    const { showMessageModal } = this.props.modalsActions;
+    showMessageModal(message);
+  };
+
+  hideMessageModal = () => {
+    const { hideMessageModal } = this.props.modalsActions;
+    hideMessageModal();
+  };
+
   handleSuccessDeleteEvent = () => {
-    const { eventsActions: { deleteEventItemRequest } } = this.props;
+    const { deleteEventItem } = this.props.eventsActions;
     const { eventItemId } = this.props.match.params;
-    deleteEventItemRequest(eventItemId);
+    deleteEventItem(eventItemId);
   };
 
   redirectToMonthPage = () => {
-    const { history, currentDate, modalActions: { hideMessageModal } } = this.props;
-    hideMessageModal();
+    const { history, currentDate } = this.props;
+    this.hideMessageModal();
     redirectToCurrentDate(history, currentDate);
   };
 
   redirectToEditEventPage = () => {
-    const { history, modalActions: { hideMessageModal } } = this.props;
+    const { history } = this.props;
     const { eventItemId } = this.props.match.params;
     const editEventPageUrl = `edit-event/${eventItemId}`;
-    hideMessageModal();
+    this.hideMessageModal();
     redirectToCurrentDate(history, editEventPageUrl);
   };
 
@@ -97,141 +121,115 @@ class ViewEventPage extends Component {
     </div>
   );
 
-  renderEditEventServerErrorMessageModal = () => {
-    const { hideMessageModal } = this.props.modalActions;
-    return (
-      <div>
-        <div className={styles.modalHeader}>Server Error! Please try again</div>
-        <ButtonSuccess onClick={hideMessageModal}>
-          Close modal
-        </ButtonSuccess>
-      </div>
-    );
-  };
-
-  renderDeleteEventErrorMessage = () => {
-    const { modalActions: { hideMessageModal } } = this.props;
-    return (
-      <div>
-        <div className={styles.modalHeader}>Server Error! Event item was not deleted!</div>
-        <ButtonSuccess onClick={hideMessageModal}>
-          Close modal
-        </ButtonSuccess>
-      </div>
-    );
-  };
+  renderModalBodyWithMessage = message => (
+    <div>
+      <div className={styles.modalHeader}>{ message }</div>
+      <ButtonSuccess onClick={this.hideMessageModal}>
+        Close modal
+      </ButtonSuccess>
+    </div>
+  );
 
   renderConfirmEditModalBodyMessage = () => {
-    const { modalActions: { hideMessageModal }, eventsActions: { editEventItemRequest } } = this.props;
+    const { editEventItem } = this.props.eventsActions;
     return (
       <div>
         <div className={styles.modalHeader}>you confirm EDIT event?</div>
         <div>
-          <ButtonSuccess onClick={editEventItemRequest}>edit event</ButtonSuccess>
-          <ButtonDefault onClick={hideMessageModal}>close modal</ButtonDefault>
+          <ButtonSuccess onClick={editEventItem}>edit event</ButtonSuccess>
+          <ButtonDefault onClick={this.hideMessageModal}>close modal</ButtonDefault>
         </div>
       </div>
     );
   };
 
-  renderConfirmDeleteModalBodyMessage = () => {
-    const { hideMessageModal } = this.props.modalActions;
-    return (
+  renderConfirmDeleteModalBodyMessage = () => (
+    <div>
+      <div className={styles.modalHeader}>you confirm DELETE event?</div>
       <div>
-        <div className={styles.modalHeader}>you confirm DELETE event?</div>
-        <div>
-          <ButtonSuccess onClick={this.handleSuccessDeleteEvent}>delete event</ButtonSuccess>
-          <ButtonDefault onClick={hideMessageModal}>close modal</ButtonDefault>
-        </div>
+        <ButtonSuccess onClick={this.handleSuccessDeleteEvent}>delete event</ButtonSuccess>
+        <ButtonDefault onClick={this.hideMessageModal}>close modal</ButtonDefault>
       </div>
-    );
-  };
+    </div>
+  );
 
-  renderEventName = () => {
-    const { currentEventItem: { eventName }, modalActions: { showMessageModal } } = this.props;
+  renderEventName = ({ eventName }) => {
     const editEventModalBodyMessage = this.renderConfirmEditModalBodyMessage();
     const deleteModalBodyMessage = this.renderConfirmDeleteModalBodyMessage();
+    const handleClickEditButton = () => this.showMessageModal(editEventModalBodyMessage);
+    const handleClickDeleteButton = () => this.showMessageModal(deleteModalBodyMessage);
     return (
       <div className={styles.eventName}>
         <h1 className={styles.header}>{ eventName }</h1>
         <div>
-          <button onClick={() => showMessageModal(editEventModalBodyMessage)} className={styles.button}>edit</button>{' '}
-          <button onClick={() => showMessageModal(deleteModalBodyMessage)} className={styles.button}>delete</button>
+          <button onClick={handleClickEditButton} className={styles.button}>edit</button>{' '}
+          <button onClick={handleClickDeleteButton} className={styles.button}>delete</button>
         </div>
       </div>
     );
   };
 
-  renderStartEventDate = () => {
-    const { isFullDay, startTime, startDate } = this.props.currentEventItem;
-    const formattedDate = formatDateString(`${startDate} ${startTime}`);
-    return (
-      <div className={styles.startEvent}>
-        {
-          (isFullDay)
-            ? (<div>That event is full day</div>)
-            : (startTime && (
-              <div>
-                <h2 className={styles.eventHeader}>Start:</h2>
-                <p className={styles.dateTime}>{ formattedDate }</p>
-              </div>
-            ))
-        }
-      </div>
-    );
-  };
-
-  renderEndEventDate = () => {
-    const { isFullDay, endTime, endDate } = this.props.currentEventItem;
-    const formattedDate = formatDateString(`${endDate} ${endTime}`);
-    return (
-      <div className={styles.startEvent}>
-        {
-          (!isFullDay && endTime) && (
+  renderStartEventDate = ({ isFullDay, startTime, startDate }) => (
+    <div className={styles.startEvent}>
+      {
+        (isFullDay)
+          ? (<div>That event is full day</div>)
+          : (startTime && (
             <div>
-              <h2 className={styles.eventHeader}>End:</h2>
-              <p className={styles.dateTime}>{ formattedDate }</p>
+              <h2 className={styles.eventHeader}>Start:</h2>
+              <p className={styles.dateTime}>
+                { formatDateString(`${startDate} ${startTime}`) }
+              </p>
             </div>
-          )
-        }
-      </div>
-    );
-  };
-
-  renderEventCaption = () => {
-    const { eventCaption } = this.props.currentEventItem;
-    return (
-      <div className={styles.eventCaption}>
-        <h2 className={styles.eventHeader}>Description:</h2>
-        { eventCaption || 'That event has no description' }
-      </div>
-    );
-  };
-
-  renderEventItemHeader = () => (
-    <div className={styles.headerContainer}>
-      <h2 className={styles.eventHeader}>Name:</h2>
-      { this.renderEventName() }
+          ))
+      }
     </div>
   );
 
-  renderEventItemBody = () => {
-    const { isFullDay } = this.props.currentEventItem;
-    return (
-      <div className={cx(styles.bodyContainer, { [styles.fullDayEvent]: isFullDay })}>
-        { this.renderStartEventDate() }
-        { this.renderEndEventDate() }
-      </div>
-    );
-  };
+  renderEndEventDate = ({ isFullDay, endTime, endDate }) => (
+    <div className={styles.startEvent}>
+      {
+        (!isFullDay && endTime) && (
+          <div>
+            <h2 className={styles.eventHeader}>End:</h2>
+            <p className={styles.dateTime}>
+              { formatDateString(`${endDate} ${endTime}`) }
+            </p>
+          </div>
+        )
+      }
+    </div>
+  );
+
+  renderEventCaption = ({ eventCaption }) => (
+    <div className={styles.eventCaption}>
+      <h2 className={styles.eventHeader}>Description:</h2>
+      { eventCaption }
+    </div>
+  );
+
+  renderEventItemHeader = currentEventItem => (
+    <div className={styles.headerContainer}>
+      <h2 className={styles.eventHeader}>Name:</h2>
+      { this.renderEventName(currentEventItem) }
+    </div>
+  );
+
+  renderEventItemBody = currentEventItem => (
+    <div className={cx(styles.bodyContainer, { [styles.fullDayEvent]: currentEventItem.isFullDay })}>
+      { this.renderStartEventDate(currentEventItem) }
+      { this.renderEndEventDate(currentEventItem) }
+    </div>
+  );
 
   render() {
+    const { currentEventItem } = this.props;
     return (
       <div className={styles.eventPage}>
         <div className={styles.eventItem}>
-          { this.renderEventItemHeader() }
-          { this.renderEventItemBody() }
-          { this.renderEventCaption() }
+          { this.renderEventItemHeader(currentEventItem) }
+          { this.renderEventItemBody(currentEventItem) }
+          { this.renderEventCaption(currentEventItem) }
         </div>
       </div>
     );
@@ -241,7 +239,7 @@ class ViewEventPage extends Component {
 ViewEventPage.propTypes = {
   match: PropTypes.object,
   eventsActions: PropTypes.object,
-  modalActions: PropTypes.object,
+  modalsActions: PropTypes.object,
   currentEventItem: PropTypes.object,
   history: PropTypes.object,
   currentDate: PropTypes.string,
@@ -254,19 +252,19 @@ ViewEventPage.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  currentEventItem: state.events.currentEventItem,
-  currentDate: state.currentDate.date,
-  deleteEventItemError: state.events.deleteEventItemError,
-  eventItemDeleted: state.events.eventItemDeleted,
-  deleteEventItemPending: state.events.deleteEventItemPending,
-  editEventItemPending: state.events.editEventItemPending,
-  editEventItemFulfilled: state.events.editEventItemFulfilled,
-  editEventItemRejected: state.events.editEventItemRejected
+  currentEventItem: state.loadEventItem.currentEventItem,
+  currentDate: state.currentDate.currentMonthNow,
+  deleteEventItemError: state.deleteEventItem.rejected,
+  eventItemDeleted: state.deleteEventItem.fulfilled,
+  deleteEventItemPending: state.deleteEventItem.pending,
+  editEventItemPending: state.editEventItem.pending,
+  editEventItemFulfilled: state.editEventItem.fulfilled,
+  editEventItemRejected: state.editEventItem.rejected
 });
 
 const mapDispatchToProps = dispatch => ({
   eventsActions: bindActionCreators(eventsActions, dispatch),
-  modalActions: bindActionCreators(modalActions, dispatch)
+  modalsActions: bindActionCreators(modalsActions, dispatch)
 });
 
 export default withRouter(

@@ -1,6 +1,8 @@
+// Modules
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
+// Styles
 import * as styles from './ButtonDefault.scss';
 
 const ButtonDefault = props => (

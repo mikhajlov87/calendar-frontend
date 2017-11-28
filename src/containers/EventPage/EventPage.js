@@ -10,17 +10,15 @@ import EventForm from '../EventForm/EventForm';
 // Components
 import MessageModalBody from '../../components/MessageModalBody/MessageModalBody';
 // Helpers
-import { redirectToCurrentDate } from '../../helpers/validate';
+import { redirectToCurrentDate } from '../../helpers/validation/validate';
 import { parseServerError } from '../../helpers/mockRequest';
-import { checkIsEventItemExist } from '../../helpers/eventsList';
+import { checkIsEventItemExist } from '../../helpers/events/create';
 // Actions
-import * as modalActions from '../../actions/modalActions';
-import * as eventActions from '../../actions/eventsActions';
+import { modalsActions, eventsActions } from './actions';
 // Styles
 import * as styles from './EventPage.scss';
 
 class EventPage extends Component {
-
   componentWillMount() {
     const { eventItemId } = this.props.match.params;
     if (eventItemId) {
@@ -29,55 +27,71 @@ class EventPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { modalActions: { showMessageModal }, history, currentDate, match: { params: { eventItemId } } } = this.props;
+    const { showMessageModal } = this.props.modalsActions;
+    const { history, currentDate } = this.props;
+    const { eventItemId } = this.props.match.params;
 
-    const {
-      eventCreated, addEventError, errorStatusCode, isMessageModalOpen, addEventPending,
-      saveEventChangesPending, eventChangesSaved, saveEventChangesError
-    } = nextProps;
-
-    const eventWasCreated = (eventCreated && (eventCreated !== this.props.eventCreated));
-    const eventWasUpdated = (eventChangesSaved && (eventChangesSaved !== this.props.eventChangesSaved));
-    const addEventRequestError = (addEventError && (addEventError !== this.props.addEventError));
-    const eventCreatedAndConfirmed = (!isMessageModalOpen && (this.props.isMessageModalOpen && eventCreated));
-    const addEventRequest = (addEventPending && (addEventPending !== this.props.addEventPending));
-
-    const saveEventChangesRequestError = (
-      saveEventChangesError && (saveEventChangesError !== this.props.saveEventChangesError)
+    const eventItemCreated = (
+      nextProps.eventItemCreated && (nextProps.eventItemCreated !== this.props.eventItemCreated)
     );
 
-    const saveEventChangesRequest = (
-      saveEventChangesPending && (saveEventChangesPending !== this.props.saveEventChangesPending)
+    const eventItemUpdated = (
+      nextProps.updateEventItemFulfilled && (nextProps.updateEventItemFulfilled !== this.props.updateEventItemFulfilled)
     );
 
-    if (eventWasCreated || eventWasUpdated) {
+    const createEventItemFailed = (
+      nextProps.createEventItemFailed && (nextProps.createEventItemFailed !== this.props.createEventItemFailed)
+    );
+
+    const eventItemCreatedAndConfirmed = (
+      (!nextProps.isMessageModalOpen) && (this.props.isMessageModalOpen && nextProps.eventItemCreated)
+    );
+
+    const eventItemUpdatedAndConfirmed = (
+      (!nextProps.isMessageModalOpen) && (this.props.isMessageModalOpen && nextProps.updateEventItemFulfilled)
+    );
+
+    const createEventItemPending = (
+      nextProps.createEventItemPending && (nextProps.createEventItemPending !== this.props.createEventItemPending)
+    );
+
+    const updateEventItemFailed = (
+      nextProps.updateEventItemRejected && (nextProps.updateEventItemRejected !== this.props.updateEventItemRejected)
+    );
+
+    const updateEventItemPending = (
+      nextProps.updateEventItemPending && (nextProps.updateEventItemPending !== this.props.updateEventItemPending)
+    );
+
+    if (eventItemCreated || eventItemUpdated) {
       const message = (eventItemId) ? 'updated' : 'created';
       const modalBody = this.renderMessageModalBody('success', `event was ${message}!`);
       showMessageModal(modalBody);
     }
 
-    if (addEventRequestError || saveEventChangesRequestError) {
-      const errorMessage = parseServerError(errorStatusCode);
+    if (createEventItemFailed || updateEventItemFailed) {
+      const errorMessage = parseServerError(this.props.errorStatusCode);
       const modalBody = this.renderMessageModalBody('error', errorMessage);
       showMessageModal(modalBody);
     }
 
-    if (eventCreatedAndConfirmed) {
+    if (eventItemCreatedAndConfirmed || eventItemUpdatedAndConfirmed) {
       redirectToCurrentDate(history, currentDate);
     }
 
-    if (addEventRequest || saveEventChangesRequest) {
+    if (createEventItemPending || updateEventItemPending) {
       showMessageModal(this.renderModalBodyWithPreloader());
     }
   }
 
   componentWillUnmount() {
-    const { clearCurrentEventItem } = this.props.eventActions;
+    const { clearCurrentEventItem } = this.props.eventsActions;
     clearCurrentEventItem();
   }
 
   verifyPermissionToEdit = () => {
-    const { eventActions: { getEventItemById }, eventsList, history, currentDate } = this.props;
+    const { eventsList, history, currentDate } = this.props;
+    const { getEventItemById } = this.props.eventsActions;
     const { eventItemId } = this.props.match.params;
     const isEventItemExist = checkIsEventItemExist(eventsList, eventItemId);
     if (isEventItemExist) {
@@ -94,7 +108,7 @@ class EventPage extends Component {
   );
 
   renderMessageModalBody = (status, message) => {
-    const { hideMessageModal } = this.props.modalActions;
+    const { hideMessageModal } = this.props.modalsActions;
     return (
       <MessageModalBody
         modalHeader={status}
@@ -121,36 +135,36 @@ class EventPage extends Component {
 EventPage.propTypes = {
   match: PropTypes.object,
   history: PropTypes.object,
-  modalActions: PropTypes.object,
+  modalsActions: PropTypes.object,
   isMessageModalOpen: PropTypes.bool,
-  addEventError: PropTypes.bool,
-  eventCreated: PropTypes.bool,
+  createEventItemFailed: PropTypes.bool,
+  eventItemCreated: PropTypes.bool,
   currentDate: PropTypes.string,
   eventsList: PropTypes.array,
-  eventActions: PropTypes.object,
+  eventsActions: PropTypes.object,
   errorStatusCode: PropTypes.string,
-  addEventPending: PropTypes.bool,
-  saveEventChangesPending: PropTypes.bool,
-  eventChangesSaved: PropTypes.bool,
-  saveEventChangesError: PropTypes.bool
+  createEventItemPending: PropTypes.bool,
+  updateEventItemPending: PropTypes.bool,
+  updateEventItemFulfilled: PropTypes.bool,
+  updateEventItemRejected: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-  isMessageModalOpen: state.modal.isMessageModalOpen,
-  addEventError: state.events.addEventError,
-  eventCreated: state.events.eventCreated,
-  errorStatusCode: state.events.errorText,
-  currentDate: state.currentDate.date,
-  eventsList: state.events.events,
-  addEventPending: state.events.addEventPending,
-  saveEventChangesPending: state.events.saveEventChangesPending,
-  eventChangesSaved: state.events.eventChangesSaved,
-  saveEventChangesError: state.events.saveEventChangesError
+  isMessageModalOpen: state.messageModal.isMessageModalOpen,
+  createEventItemFailed: state.createEventItem.rejected,
+  eventItemCreated: state.createEventItem.fulfilled,
+  errorStatusCode: state.createEventItem.errorMessage,
+  currentDate: state.currentDate.currentMonthNow,
+  eventsList: state.loadEventItem.events,
+  createEventItemPending: state.createEventItem.pending,
+  updateEventItemPending: state.updateEvents.pending,
+  updateEventItemFulfilled: state.updateEvents.fulfilled,
+  updateEventItemRejected: state.updateEvents.rejected
 });
 
 const mapDispatchToProps = dispatch => ({
-  modalActions: bindActionCreators(modalActions, dispatch),
-  eventActions: bindActionCreators(eventActions, dispatch)
+  modalsActions: bindActionCreators(modalsActions, dispatch),
+  eventsActions: bindActionCreators(eventsActions, dispatch)
 });
 
 export default withRouter(

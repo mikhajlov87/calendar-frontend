@@ -6,8 +6,8 @@ import cx from 'classnames';
 // Components
 import EventLink from '../EventLink/EventLink';
 // Helpers
-import { redirectToCurrentDate } from '../../helpers/validate';
-import { mapInstanceToArray } from '../../helpers/calendarEvents';
+import { redirectToCurrentDate } from '../../helpers/validation/validate';
+import { mapInstanceToArray } from '../../helpers/events/dayEventsObject';
 // Styles
 import * as styles from './DayComponent.scss';
 

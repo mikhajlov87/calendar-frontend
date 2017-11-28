@@ -8,43 +8,51 @@ import MonthComponent from '../../components/MonthComponent/MonthComponent';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import PageContent from '../../components/PageContent/PageContent';
 // Helpers
-import { getFullYear, getMonthsInYear, getPreviousYear, getNextYear } from '../../helpers/yearTime';
-import { redirectToCurrentDate, validateYear } from '../../helpers/validate';
+import { getFullYear, getMonthsInYear, getPreviousYear, getNextYear } from '../../helpers/calendar/year';
+import { redirectToCurrentDate, validateYear } from '../../helpers/validation/validate';
 // Styles
 import * as styles from './YearPage.scss';
 
 class YearPage extends Component {
   componentWillMount() {
     const { year } = this.props.params;
-    const { history, date } = this.props;
+    const { history, currentMonthNow } = this.props;
     const yearIsNotValid = !validateYear(year);
     if (yearIsNotValid) {
-      redirectToCurrentDate(history, date);
+      redirectToCurrentDate(history, currentMonthNow);
     }
   }
+
+  renderMonthComponent = ({ key, name, url, isCurrentMonth }) => (
+    <MonthComponent
+      key={key}
+      monthName={name}
+      monthUrl={url}
+      currentMonth={isCurrentMonth}
+    />
+  );
+
   renderMonthInYear = (year) => {
     const monthsArr = getMonthsInYear(year);
-    return monthsArr.map(item => (
-      <MonthComponent
-        key={item.key}
-        monthName={item.name}
-        monthUrl={item.url}
-        currentMonth={item.isCurrentMonth}
-      />
-    ));
+    return monthsArr.map(this.renderMonthComponent);
   };
+
+  renderPageHeader = year => (
+    <PageHeader
+      prev={getPreviousYear(year)}
+      next={getNextYear(year)}
+      leftButtonTitle="prev year"
+      rightButtonTitle="next year"
+    >
+      { getFullYear(year) }
+    </PageHeader>
+  );
+
   render() {
     const { year } = this.props.params;
     return (
       <div className={styles.year}>
-        <PageHeader
-          prev={getPreviousYear(year)}
-          next={getNextYear(year)}
-          leftButtonTitle="prev year"
-          rightButtonTitle="next year"
-        >
-          { getFullYear(year) }
-        </PageHeader>
+        { this.renderPageHeader(year) }
         <PageContent>{ this.renderMonthInYear(year) }</PageContent>
       </div>
     );
@@ -54,11 +62,13 @@ class YearPage extends Component {
 YearPage.propTypes = {
   history: PropTypes.object,
   params: PropTypes.object,
-  date: PropTypes.string
+  currentMonthNow: PropTypes.string
 };
 
 const mapStateToProps = state => ({
-  date: state.currentDate.date
+  currentMonthNow: state.currentDate.currentMonthNow
 });
 
-export default withRouter(connect(mapStateToProps)(YearPage));
+export default withRouter(
+  connect(mapStateToProps)(YearPage)
+);

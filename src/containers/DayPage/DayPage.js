@@ -9,39 +9,48 @@ import PageHeader from '../../components/PageHeader/PageHeader';
 import PageContent from '../../components/PageContent/PageContent';
 import HourComponent from '../../components/Hour/HourComponent';
 // Helpers
-import { getMonthName, getDateStringFormatYearMonthDay } from '../../helpers/momentTime';
+import { getMonthName, getDateStringFormatYearMonthDay } from '../../helpers/moment';
 import {
-  getNextDay, getDayNumber, getPreviousDay, getDayHoursArr, convertDateString, makeConvertConfig, isBetweenHour
-} from '../../helpers/dayTime';
-import { validateDate, redirectToCurrentDate } from '../../helpers/validate';
-import { mapInstanceToArray, DayEventObj } from '../../helpers/calendarEvents';
+  getNextDay,
+  getDayNumber,
+  getPreviousDay,
+  getDayHoursArr,
+  convertDateString,
+  makeConvertConfig,
+  isBetweenHour
+} from '../../helpers/calendar/day';
+import { validateDate, redirectToCurrentDate } from '../../helpers/validation/validate';
+import { mapInstanceToArray, getDayEventsObject } from '../../helpers/events/dayEventsObject';
 // Styles
 import * as styles from './DayPage.scss';
 
 class DayPage extends Component {
-
-  state = { currentDate: '', dayEvents: {} };
+  state = {
+    currentDate: '',
+    dayEvents: {}
+  };
 
   componentWillMount() {
-    const { history, date, match: { params: { year, month, day } } } = this.props;
+    const { history, currentMonthNow } = this.props;
+    const { year, month, day } = this.props.match.params;
     const dateIsNotValid = !validateDate({ year, month, day });
     if (dateIsNotValid) {
-      redirectToCurrentDate(history, date);
+      redirectToCurrentDate(history, currentMonthNow);
     }
     this.setDayEventsToState({ year, month, day });
   }
 
-  componentWillReceiveProps({ location: { pathname }, params }) {
-    const isAnotherDay = (pathname !== this.props.location.pathname);
+  componentWillReceiveProps(nextProps) {
+    const isAnotherDay = (nextProps.location.pathname !== this.props.location.pathname);
     if (isAnotherDay) {
-      this.setDayEventsToState(params);
+      this.setDayEventsToState(nextProps.match.params);
     }
   }
 
   setDayEventsToState = ({ year, month, day }) => {
-    const { dayEvents } = this.props;
+    const { calendarDayEvents } = this.props;
     const currentDate = this.getCurrentDate({ year, month, day });
-    const dayEventsObj = dayEvents.get(currentDate) || new DayEventObj();
+    const dayEventsObj = getDayEventsObject(calendarDayEvents, currentDate);
     const { fullDayEvents, hourlyEvents, transitionalEvents } = dayEventsObj;
 
     this.setState({
@@ -72,9 +81,9 @@ class DayPage extends Component {
     )
   );
 
-
   renderDayHours = () => {
-    const { currentDate, dayEvents: { hourlyEvents } } = this.state;
+    const { currentDate } = this.state;
+    const { hourlyEvents } = this.state.dayEvents;
     const dayHours = getDayHoursArr();
     return dayHours.map(({ key, hour }) => {
       const currentHourEvents = hourlyEvents.filter(
@@ -171,14 +180,14 @@ DayPage.propTypes = {
   match: PropTypes.object,
   history: PropTypes.object,
   location: PropTypes.object,
-  date: PropTypes.string,
+  currentMonthNow: PropTypes.string,
   params: PropTypes.object,
-  dayEvents: PropTypes.object
+  calendarDayEvents: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  date: state.currentDate.date,
-  dayEvents: state.events.calendarDayEvents
+  currentMonthNow: state.currentDate.currentMonthNow,
+  calendarDayEvents: state.loadEventItem.calendarDayEvents
 });
 
 export default withRouter(

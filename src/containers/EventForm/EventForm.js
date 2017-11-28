@@ -14,41 +14,49 @@ import ButtonDefault from '../../components/ButtonDefault/ButtonDefault';
 import RenderField from './RenderField/RenderField';
 import ModalConfirmBody from '../../components/ModalConfirm/ModalConfirmBody';
 // Helpers
-import { validate } from '../../helpers/formValidation';
+import { validate } from '../../helpers/validation/formValidation';
 import formFieldsProps from './config';
 // Actions
-import * as modalActions from '../../actions/modalActions';
-import * as eventActions from '../../actions/eventsActions';
+import { modalsActions, eventsActions } from './actions';
 // Styles
 import * as styles from './EventForm.scss';
 
 class EventForm extends Component {
-
-  state = { formData: null };
+  state = {
+    formData: null
+  };
 
   confirmSubmitting = (formData) => {
-    const { modalActions: { showMessageModal }, match: { params: { eventItemId } } } = this.props;
-    const modalMessage = (eventItemId) ? (this.renderConfirmSaveChangesModalBody()) : (this.renderBodyConfirmModal());
+    const { showMessageModal } = this.props.modalsActions;
+    const { eventItemId } = this.props.match.params;
+    const modalMessage = (
+      (eventItemId)
+        ? (this.renderConfirmSaveChangesModalBody())
+        : (this.renderBodyConfirmModal())
+    );
     this.setState({ formData });
     showMessageModal(modalMessage);
   };
 
   createEvent = () => {
     const { formData } = this.state;
-    const { eventActions: { addEventRequest } } = this.props;
-    addEventRequest(formData);
+    const { createEventItem } = this.props.eventsActions;
+    createEventItem(formData);
   };
 
   saveChanges = () => {
     const { formData } = this.state;
-    const { eventActions: { saveEventChangesRequest }, initialValues: { id } } = this.props;
+    const { id } = this.props.initialValues;
+    const { updateEventItem } = this.props.eventsActions;
     const eventObject = { ...formData, id };
-    saveEventChangesRequest(eventObject);
+    updateEventItem(eventObject);
   };
 
   abortCreatingEvent = () => {
-    const { hideMessageModal } = this.props.modalActions;
-    this.setState({ formData: null });
+    const { hideMessageModal } = this.props.modalsActions;
+    this.setState({
+      formData: null
+    });
     hideMessageModal();
   };
 
@@ -148,8 +156,8 @@ class EventForm extends Component {
 }
 
 EventForm.propTypes = {
-  eventActions: PropTypes.object,
-  modalActions: PropTypes.object,
+  eventsActions: PropTypes.object,
+  modalsActions: PropTypes.object,
   handleSubmit: PropTypes.func,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
@@ -166,13 +174,13 @@ const mapStateToProps = (state) => {
   return {
     form: state.reduxForm,
     isFullDayValue,
-    initialValues: state.events.currentEventItem
+    initialValues: state.loadEventItem.currentEventItem
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  eventActions: bindActionCreators(eventActions, dispatch),
-  modalActions: bindActionCreators(modalActions, dispatch)
+  eventsActions: bindActionCreators(eventsActions, dispatch),
+  modalsActions: bindActionCreators(modalsActions, dispatch)
 });
 
 export default connect(

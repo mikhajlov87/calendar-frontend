@@ -1,9 +1,13 @@
+// Modules
 import React from 'react';
 import PropTypes from 'prop-types';
+// Styles
 import * as styles from './PageContent.scss';
 
 const PageContent = props => (
-  <main className={styles.content}>{props.children}</main>
+  <main className={styles.content}>
+    {props.children}
+  </main>
 );
 
 PageContent.propTypes = {
