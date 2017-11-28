@@ -14,40 +14,42 @@ import MessageModalBody from '../../components/MessageModalBody/MessageModalBody
 // Helpers
 import { setupStorage } from '../../helpers/localStorage';
 // Actions
-import * as pageActions from '../../actions';
-import * as eventActions from '../../actions/eventsActions';
-import * as modalActions from '../../actions/modalActions';
+import { eventsActions, modalsActions, calendarActions } from './actions';
 // Styles
 import * as styles from './App.scss';
 
 class App extends Component {
   componentWillMount() {
-    const { getCurrentDateNow } = this.props.pageActions;
-    const { getEventsListRequest } = this.props.eventsActions;
+    const { getCurrentDateNow } = this.props.calendarActions;
+    const { getEventsList } = this.props.eventsActions;
     setupStorage();
     getCurrentDateNow();
-    getEventsListRequest();
+    getEventsList();
   }
 
-  componentWillReceiveProps({ eventsListRejected }) {
-    const eventsListRequestError = (eventsListRejected && eventsListRejected !== this.props.eventsListRejected);
-    const { showMessageModal } = this.props.modalActions;
-    if (eventsListRequestError) {
-      showMessageModal(this.renderErrorMessageModalBody());
+  componentWillReceiveProps(nextProps) {
+    const getEventsListFailed = (
+      nextProps.getEventsListFailed && (nextProps.getEventsListFailed !== this.props.getEventsListFailed)
+    );
+    if (getEventsListFailed) {
+      this.showErrorMessageModal();
     }
   }
 
-  renderErrorMessageModalBody = () => {
-    const { hideMessageModal } = this.props.modalActions;
-    return (
-      <MessageModalBody
-        accepted={hideMessageModal}
-        acceptButtonLabel="close modal"
-        modalHeader="Sorry! Something went wrong"
-        modalBody="Please, try again later"
-      />
-    );
+  showErrorMessageModal = () => {
+    const { showMessageModal, hideMessageModal } = this.props.modalsActions;
+    const errorMessageModalBody = this.renderErrorMessageModalBody(hideMessageModal);
+    showMessageModal(errorMessageModalBody);
   };
+
+  renderErrorMessageModalBody = acceptedFuncCallback => (
+    <MessageModalBody
+      accepted={acceptedFuncCallback}
+      acceptButtonLabel="close modal"
+      modalHeader="Sorry! Something went wrong"
+      modalBody="Please, try again later"
+    />
+  );
 
   renderApp = date => (
     <div className={styles.appContainer}>
@@ -67,13 +69,13 @@ class App extends Component {
   );
 
   render() {
-    const { date, eventsListPending, eventsListSorted, eventsListRejected } = this.props;
+    const { currentMonthNow, getEventsListPending, eventsListSorted, getEventsListFailed } = this.props;
     return (
-      <div className={cx(styles.app, { [styles.appPreload]: eventsListPending })}>
+      <div className={cx(styles.app, { [styles.appPreload]: getEventsListPending })}>
         {
-          (!eventsListSorted && !eventsListRejected)
-            ? (<RingLoader loading={!eventsListSorted && !eventsListRejected} />)
-            : (this.renderApp(date))
+          (!eventsListSorted && !getEventsListFailed)
+            ? (<RingLoader loading />)
+            : (this.renderApp(currentMonthNow))
         }
       </div>
     );
@@ -81,26 +83,26 @@ class App extends Component {
 }
 
 App.propTypes = {
-  pageActions: PropTypes.object,
+  calendarActions: PropTypes.object,
   eventsActions: PropTypes.object,
-  modalActions: PropTypes.object,
-  date: PropTypes.string,
-  eventsListPending: PropTypes.bool,
+  modalsActions: PropTypes.object,
+  currentMonthNow: PropTypes.string,
+  getEventsListPending: PropTypes.bool,
   eventsListSorted: PropTypes.bool,
-  eventsListRejected: PropTypes.bool
+  getEventsListFailed: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-  date: state.currentDate.date,
-  eventsListPending: state.events.eventsListPending,
-  eventsListSorted: state.events.eventsListSorted,
-  eventsListRejected: state.events.eventsListRejected
+  currentMonthNow: state.currentDate.currentMonthNow,
+  getEventsListPending: state.loadEventItem.pending,
+  eventsListSorted: state.loadEventItem.sorted,
+  getEventsListFailed: state.loadEventItem.rejected
 });
 
 const mapDispatchToProps = dispatch => ({
-  pageActions: bindActionCreators(pageActions, dispatch),
-  eventsActions: bindActionCreators(eventActions, dispatch),
-  modalActions: bindActionCreators(modalActions, dispatch)
+  calendarActions: bindActionCreators(calendarActions, dispatch),
+  eventsActions: bindActionCreators(eventsActions, dispatch),
+  modalsActions: bindActionCreators(modalsActions, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

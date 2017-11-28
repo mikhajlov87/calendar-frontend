@@ -1,5 +1,7 @@
+// Modules
 import React from 'react';
 import PropTypes from 'prop-types';
+// Styles
 import * as styles from './Checkbox.scss';
 
 const CheckBox = ({ label, input, id }) => (

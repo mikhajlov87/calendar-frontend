@@ -17,8 +17,8 @@ const MessageModal = props => (
 );
 
 const mapStateToProps = state => ({
-  isMessageModalOpen: state.modal.isMessageModalOpen,
-  modalBody: state.modal.modalBody
+  isMessageModalOpen: state.messageModal.isMessageModalOpen,
+  modalBody: state.messageModal.modalBody
 });
 
 MessageModal.propTypes = {

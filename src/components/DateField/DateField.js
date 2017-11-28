@@ -1,7 +1,9 @@
+// Modules
 import React from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
+// Styles
 import 'react-day-picker/lib/style.css';
 import * as styles from './DateField.scss';
 

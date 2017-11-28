@@ -1,0 +1,3 @@
+export const GET_CURRENT_DATE_NOW = 'GET_CURRENT_DATE_NOW';
+
+export default GET_CURRENT_DATE_NOW;
