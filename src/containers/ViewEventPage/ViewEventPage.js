@@ -25,31 +25,21 @@ class ViewEventPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const deleteEventItemPending = (
-      nextProps.deleteEventItemPending && (nextProps.deleteEventItemPending !== this.props.deleteEventItemPending)
-    );
-
-    const editEventItemPending = (
-      nextProps.editEventItemPending && (nextProps.editEventItemPending !== this.props.editEventItemPending)
+    const shouldShowPreloader = (
+      this.props.modalState.isMessageModalOpen && nextProps.eventsState.pending
+        && (nextProps.eventsState.pending !== this.props.eventsState.pending)
     );
 
     const eventItemDeletedSuccessfully = (
-      nextProps.eventItemDeleted && (nextProps.eventItemDeleted !== this.props.eventItemDeleted)
+      nextProps.eventsState.deleteSuccess
+        && (nextProps.eventsState.deleteSuccess !== this.props.eventsState.deleteSuccess)
     );
 
-    const deleteEventItemRejected = (
-      nextProps.deleteEventItemError && (nextProps.deleteEventItemError !== this.props.deleteEventItemError)
+    const shouldShowErrorMessage = (
+      nextProps.eventsState.rejected && (nextProps.eventsState.rejected !== this.props.eventsState.rejected)
     );
 
-    const editEventItemSuccessfully = (
-      nextProps.editEventItemFulfilled && (nextProps.editEventItemFulfilled !== this.props.editEventItemFulfilled)
-    );
-
-    const editEventItemRejected = (
-      nextProps.editEventItemRejected && (nextProps.editEventItemRejected !== this.props.editEventItemRejected)
-    );
-
-    if (deleteEventItemPending || editEventItemPending) {
+    if (shouldShowPreloader) {
       this.showMessageModal(this.renderModalBodyWithPreloader());
     }
 
@@ -57,28 +47,18 @@ class ViewEventPage extends Component {
       this.showMessageModal(this.renderDeleteEventSuccessMessage());
     }
 
-    if (deleteEventItemRejected || editEventItemRejected) {
-      const message = (
-        (deleteEventItemRejected)
-          ? ('Server Error! Event item was not deleted!')
-          : ('Server Error! Please try again')
-      );
+    if (shouldShowErrorMessage) {
+      const message = 'Server Error! Please try again';
       this.showMessageModal(this.renderModalBodyWithMessage(message));
-    }
-
-    if (editEventItemSuccessfully) {
-      this.redirectToEditEventPage();
     }
   }
 
   componentWillUnmount() {
-    const { clearCurrentEventItem } = this.props.eventsActions;
-    clearCurrentEventItem();
+    this.props.eventsActions.clearCurrentEventItem();
   }
 
   showMessageModal = (message) => {
-    const { showMessageModal } = this.props.modalsActions;
-    showMessageModal(message);
+    this.props.modalsActions.showMessageModal(message);
   };
 
   hideMessageModal = () => {
@@ -93,9 +73,10 @@ class ViewEventPage extends Component {
   };
 
   redirectToMonthPage = () => {
-    const { history, currentDate } = this.props;
+    const { history } = this.props;
+    const { currentMonthNow } = this.props.currentDate;
     this.hideMessageModal();
-    redirectToCurrentDate(history, currentDate);
+    redirectToCurrentDate(history, currentMonthNow);
   };
 
   redirectToEditEventPage = () => {
@@ -130,19 +111,6 @@ class ViewEventPage extends Component {
     </div>
   );
 
-  renderConfirmEditModalBodyMessage = () => {
-    const { editEventItem } = this.props.eventsActions;
-    return (
-      <div>
-        <div className={styles.modalHeader}>you confirm EDIT event?</div>
-        <div>
-          <ButtonSuccess onClick={editEventItem}>edit event</ButtonSuccess>
-          <ButtonDefault onClick={this.hideMessageModal}>close modal</ButtonDefault>
-        </div>
-      </div>
-    );
-  };
-
   renderConfirmDeleteModalBodyMessage = () => (
     <div>
       <div className={styles.modalHeader}>you confirm DELETE event?</div>
@@ -154,15 +122,13 @@ class ViewEventPage extends Component {
   );
 
   renderEventName = ({ eventName }) => {
-    const editEventModalBodyMessage = this.renderConfirmEditModalBodyMessage();
     const deleteModalBodyMessage = this.renderConfirmDeleteModalBodyMessage();
-    const handleClickEditButton = () => this.showMessageModal(editEventModalBodyMessage);
     const handleClickDeleteButton = () => this.showMessageModal(deleteModalBodyMessage);
     return (
       <div className={styles.eventName}>
         <h1 className={styles.header}>{ eventName }</h1>
         <div>
-          <button onClick={handleClickEditButton} className={styles.button}>edit</button>{' '}
+          <button onClick={this.redirectToEditEventPage} className={styles.button}>edit</button>{' '}
           <button onClick={handleClickDeleteButton} className={styles.button}>delete</button>
         </div>
       </div>
@@ -223,7 +189,7 @@ class ViewEventPage extends Component {
   );
 
   render() {
-    const { currentEventItem } = this.props;
+    const { currentEventItem } = this.props.eventsState;
     return (
       <div className={styles.eventPage}>
         <div className={styles.eventItem}>
@@ -240,26 +206,16 @@ ViewEventPage.propTypes = {
   match: PropTypes.object,
   eventsActions: PropTypes.object,
   modalsActions: PropTypes.object,
-  currentEventItem: PropTypes.object,
   history: PropTypes.object,
-  currentDate: PropTypes.string,
-  eventItemDeleted: PropTypes.bool,
-  deleteEventItemError: PropTypes.bool,
-  deleteEventItemPending: PropTypes.bool,
-  editEventItemPending: PropTypes.bool,
-  editEventItemFulfilled: PropTypes.bool,
-  editEventItemRejected: PropTypes.bool
+  currentDate: PropTypes.object,
+  eventsState: PropTypes.object,
+  modalState: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  currentEventItem: state.loadEventItem.currentEventItem,
-  currentDate: state.currentDate.currentMonthNow,
-  deleteEventItemError: state.deleteEventItem.rejected,
-  eventItemDeleted: state.deleteEventItem.fulfilled,
-  deleteEventItemPending: state.deleteEventItem.pending,
-  editEventItemPending: state.editEventItem.pending,
-  editEventItemFulfilled: state.editEventItem.fulfilled,
-  editEventItemRejected: state.editEventItem.rejected
+  currentDate: state.currentDate,
+  eventsState: state.events,
+  modalState: state.messageModal
 });
 
 const mapDispatchToProps = dispatch => ({

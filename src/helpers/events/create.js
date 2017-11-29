@@ -9,6 +9,7 @@ import {
   checkMomentObjectsIsAfterDay,
   checkMomentObjectsIsSameDay
 } from '../moment';
+import { setItemIntoMapInstanceByEventType } from './sort';
 
 export const createUniqueStringId = () => {
   const radix = 16;
@@ -56,4 +57,14 @@ export const createEventItemObject = (eventItem) => {
     isTransitionalEvent: (!eventItem.isFullDay && (checkMomentObjectsIsAfterDay(startEventMoment, endEventMoment))),
     isHourlyEvent: (!eventItem.isFullDay && (checkMomentObjectsIsSameDay(startEventMoment, endEventMoment)))
   };
+};
+
+export const convertEventListToMapInstance = (eventList) => {
+  const mapInstance = new Map();
+  if (eventList.length) {
+    eventList.forEach(
+      eventListItem => setItemIntoMapInstanceByEventType(eventListItem, mapInstance)
+    );
+  }
+  return mapInstance;
 };

@@ -16,7 +16,8 @@ import * as styles from './YearPage.scss';
 class YearPage extends Component {
   componentWillMount() {
     const { year } = this.props.params;
-    const { history, currentMonthNow } = this.props;
+    const { history } = this.props;
+    const { currentMonthNow } = this.props.currentDate;
     const yearIsNotValid = !validateYear(year);
     if (yearIsNotValid) {
       redirectToCurrentDate(history, currentMonthNow);
@@ -62,11 +63,11 @@ class YearPage extends Component {
 YearPage.propTypes = {
   history: PropTypes.object,
   params: PropTypes.object,
-  currentMonthNow: PropTypes.string
+  currentDate: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  currentMonthNow: state.currentDate.currentMonthNow
+  currentDate: state.currentDate
 });
 
 export default withRouter(

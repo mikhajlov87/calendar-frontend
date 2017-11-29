@@ -20,16 +20,14 @@ import * as styles from './App.scss';
 
 class App extends Component {
   componentWillMount() {
-    const { getCurrentDateNow } = this.props.calendarActions;
-    const { getEventsList } = this.props.eventsActions;
     setupStorage();
-    getCurrentDateNow();
-    getEventsList();
+    this.props.calendarActions.getCurrentDateNow();
+    this.props.eventsActions.getEventsList();
   }
 
   componentWillReceiveProps(nextProps) {
     const getEventsListFailed = (
-      nextProps.getEventsListFailed && (nextProps.getEventsListFailed !== this.props.getEventsListFailed)
+      nextProps.eventsState.rejected && (nextProps.eventsState.rejected !== this.props.eventsState.rejected)
     );
     if (getEventsListFailed) {
       this.showErrorMessageModal();
@@ -37,17 +35,16 @@ class App extends Component {
   }
 
   showErrorMessageModal = () => {
-    const { showMessageModal, hideMessageModal } = this.props.modalsActions;
-    const errorMessageModalBody = this.renderErrorMessageModalBody(hideMessageModal);
-    showMessageModal(errorMessageModalBody);
+    const errorMessageModalBody = this.renderErrorMessageModalBody();
+    this.props.modalsActions.showMessageModal(errorMessageModalBody);
   };
 
-  renderErrorMessageModalBody = acceptedFuncCallback => (
+  renderErrorMessageModalBody = () => (
     <MessageModalBody
-      accepted={acceptedFuncCallback}
+      accepted={this.props.modalsActions.hideMessageModal}
       acceptButtonLabel="close modal"
-      modalHeader="Sorry! Something went wrong"
-      modalBody="Please, try again later"
+      modalHeader="Sorry! Something went wrong :("
+      modalBody="Need to refresh page!"
     />
   );
 
@@ -69,11 +66,12 @@ class App extends Component {
   );
 
   render() {
-    const { currentMonthNow, getEventsListPending, eventsListSorted, getEventsListFailed } = this.props;
+    const { currentMonthNow } = this.props.currentDate;
+    const { getEventsListSuccess, rejected } = this.props.eventsState;
     return (
-      <div className={cx(styles.app, { [styles.appPreload]: getEventsListPending })}>
+      <div className={cx(styles.app, { [styles.appPreload]: (!getEventsListSuccess && !rejected) })}>
         {
-          (!eventsListSorted && !getEventsListFailed)
+          (!getEventsListSuccess && !rejected)
             ? (<RingLoader loading />)
             : (this.renderApp(currentMonthNow))
         }
@@ -86,17 +84,13 @@ App.propTypes = {
   calendarActions: PropTypes.object,
   eventsActions: PropTypes.object,
   modalsActions: PropTypes.object,
-  currentMonthNow: PropTypes.string,
-  getEventsListPending: PropTypes.bool,
-  eventsListSorted: PropTypes.bool,
-  getEventsListFailed: PropTypes.bool
+  currentDate: PropTypes.object,
+  eventsState: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  currentMonthNow: state.currentDate.currentMonthNow,
-  getEventsListPending: state.loadEventItem.pending,
-  eventsListSorted: state.loadEventItem.sorted,
-  getEventsListFailed: state.loadEventItem.rejected
+  currentDate: state.currentDate,
+  eventsState: state.events
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -7,9 +7,6 @@ import {
 import timeConstants from '../../constants/dateTime';
 // Helpers
 import mockRequest from '../../helpers/mockRequest';
-// Actions
-import { addSavedEventsListToStorage } from './save';
-import { sortEventsList } from './sort';
 
 export const updateEventPending = () => ({
   type: UPDATE_EVENT_PENDING
@@ -28,11 +25,7 @@ export const updateEventItem = eventItem => (dispatch) => {
   dispatch(updateEventPending());
   mockRequest(eventItem, timeConstants.ONE_SECOND)
     .then(
-      (res) => {
-        dispatch(updateEventFulfilled(res));
-        dispatch(addSavedEventsListToStorage());
-        dispatch(sortEventsList());
-      },
+      res => dispatch(updateEventFulfilled(res)),
       () => dispatch(updateEventRejected())
     );
 };

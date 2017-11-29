@@ -174,7 +174,7 @@ const mapStateToProps = (state) => {
   return {
     form: state.reduxForm,
     isFullDayValue,
-    initialValues: state.loadEventItem.currentEventItem
+    initialValues: state.events.currentEventItem
   };
 };
 

@@ -2,7 +2,7 @@
 import { getDayEventsObject } from './dayEventsObject';
 import { createTransitionalEventsLists } from './transitionalEvents';
 
-export const sortEventItemsList = (eventItem, calendarDayEvents) => {
+export const setItemIntoMapInstanceByEventType = (eventItem, calendarDayEvents) => {
   if (eventItem) {
     const { isFullDayEvent, isTransitionalEvent, isHourlyEvent, startDate, id } = eventItem;
     const { fullDayEvents, hourlyEvents } = getDayEventsObject(calendarDayEvents, startDate);
@@ -26,4 +26,4 @@ export const sortEventItemsList = (eventItem, calendarDayEvents) => {
   return false;
 };
 
-export default sortEventItemsList;
+export default setItemIntoMapInstanceByEventType;
