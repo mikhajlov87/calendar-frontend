@@ -31,7 +31,8 @@ class DayPage extends Component {
   };
 
   componentWillMount() {
-    const { history, currentMonthNow } = this.props;
+    const { history } = this.props;
+    const { currentMonthNow } = this.props.currentDate;
     const { year, month, day } = this.props.match.params;
     const dateIsNotValid = !validateDate({ year, month, day });
     if (dateIsNotValid) {
@@ -48,7 +49,7 @@ class DayPage extends Component {
   }
 
   setDayEventsToState = ({ year, month, day }) => {
-    const { calendarDayEvents } = this.props;
+    const { calendarDayEvents } = this.props.eventsState;
     const currentDate = this.getCurrentDate({ year, month, day });
     const dayEventsObj = getDayEventsObject(calendarDayEvents, currentDate);
     const { fullDayEvents, hourlyEvents, transitionalEvents } = dayEventsObj;
@@ -180,14 +181,14 @@ DayPage.propTypes = {
   match: PropTypes.object,
   history: PropTypes.object,
   location: PropTypes.object,
-  currentMonthNow: PropTypes.string,
+  currentDate: PropTypes.object,
   params: PropTypes.object,
-  calendarDayEvents: PropTypes.object
+  eventsState: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  currentMonthNow: state.currentDate.currentMonthNow,
-  calendarDayEvents: state.loadEventItem.calendarDayEvents
+  currentDate: state.currentDate,
+  eventsState: state.events
 });
 
 export default withRouter(

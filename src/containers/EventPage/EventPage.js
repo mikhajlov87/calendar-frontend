@@ -22,82 +22,69 @@ class EventPage extends Component {
   componentWillMount() {
     const { eventItemId } = this.props.match.params;
     if (eventItemId) {
-      this.verifyPermissionToEdit();
+      this.verifyPermissionToEdit(eventItemId);
     }
   }
 
   componentWillReceiveProps(nextProps) {
     const { showMessageModal } = this.props.modalsActions;
-    const { history, currentDate } = this.props;
+    const { history } = this.props;
+    const { currentMonthNow } = this.props.currentDate;
     const { eventItemId } = this.props.match.params;
 
-    const eventItemCreated = (
-      nextProps.eventItemCreated && (nextProps.eventItemCreated !== this.props.eventItemCreated)
+    const shouldShowSuccessMessage = (
+      nextProps.eventsState.fulfilled && (nextProps.eventsState.fulfilled !== this.props.eventsState.fulfilled)
     );
 
-    const eventItemUpdated = (
-      nextProps.updateEventItemFulfilled && (nextProps.updateEventItemFulfilled !== this.props.updateEventItemFulfilled)
+    const shouldShowErrorMessage = (
+      nextProps.eventsState.rejected && (nextProps.eventsState.rejected !== this.props.eventsState.rejected)
     );
 
-    const createEventItemFailed = (
-      nextProps.createEventItemFailed && (nextProps.createEventItemFailed !== this.props.createEventItemFailed)
+    const messageModalShownAndConfirmed = (
+      (!nextProps.modalState.isMessageModalOpen)
+        && (this.props.modalState.isMessageModalOpen)
+        && (nextProps.eventsState.fulfilled)
     );
 
-    const eventItemCreatedAndConfirmed = (
-      (!nextProps.isMessageModalOpen) && (this.props.isMessageModalOpen && nextProps.eventItemCreated)
+    const shouldShowPreloader = (
+      nextProps.eventsState.pending && (nextProps.eventsState.pending !== this.props.eventsState.pending)
     );
 
-    const eventItemUpdatedAndConfirmed = (
-      (!nextProps.isMessageModalOpen) && (this.props.isMessageModalOpen && nextProps.updateEventItemFulfilled)
-    );
-
-    const createEventItemPending = (
-      nextProps.createEventItemPending && (nextProps.createEventItemPending !== this.props.createEventItemPending)
-    );
-
-    const updateEventItemFailed = (
-      nextProps.updateEventItemRejected && (nextProps.updateEventItemRejected !== this.props.updateEventItemRejected)
-    );
-
-    const updateEventItemPending = (
-      nextProps.updateEventItemPending && (nextProps.updateEventItemPending !== this.props.updateEventItemPending)
-    );
-
-    if (eventItemCreated || eventItemUpdated) {
+    if (shouldShowSuccessMessage) {
       const message = (eventItemId) ? 'updated' : 'created';
       const modalBody = this.renderMessageModalBody('success', `event was ${message}!`);
       showMessageModal(modalBody);
     }
 
-    if (createEventItemFailed || updateEventItemFailed) {
-      const errorMessage = parseServerError(this.props.errorStatusCode);
+    if (shouldShowErrorMessage) {
+      const errorMessage = parseServerError(nextProps.eventsState.errorStatusCode);
       const modalBody = this.renderMessageModalBody('error', errorMessage);
       showMessageModal(modalBody);
     }
 
-    if (eventItemCreatedAndConfirmed || eventItemUpdatedAndConfirmed) {
-      redirectToCurrentDate(history, currentDate);
+    if (messageModalShownAndConfirmed) {
+      redirectToCurrentDate(history, currentMonthNow);
     }
 
-    if (createEventItemPending || updateEventItemPending) {
+    if (shouldShowPreloader) {
       showMessageModal(this.renderModalBodyWithPreloader());
     }
   }
 
   componentWillUnmount() {
-    const { clearCurrentEventItem } = this.props.eventsActions;
-    clearCurrentEventItem();
+    this.props.eventsActions.clearCurrentEventItem();
   }
 
-  verifyPermissionToEdit = () => {
-    const { eventsList, history, currentDate } = this.props;
+  verifyPermissionToEdit = (eventItemId) => {
+    const { history } = this.props;
+    const { currentMonthNow } = this.props.currentDate;
     const { getEventItemById } = this.props.eventsActions;
-    const { eventItemId } = this.props.match.params;
+    const { eventsList } = this.props.eventsState;
     const isEventItemExist = checkIsEventItemExist(eventsList, eventItemId);
     if (isEventItemExist) {
       getEventItemById(eventItemId);
     } else {
-      redirectToCurrentDate(history, currentDate);
+      redirectToCurrentDate(history, currentMonthNow);
     }
   };
 
@@ -107,17 +94,14 @@ class EventPage extends Component {
     </div>
   );
 
-  renderMessageModalBody = (status, message) => {
-    const { hideMessageModal } = this.props.modalsActions;
-    return (
-      <MessageModalBody
-        modalHeader={status}
-        modalBody={message}
-        acceptButtonLabel="ok"
-        accepted={hideMessageModal}
-      />
-    );
-  };
+  renderMessageModalBody = (status, message) => (
+    <MessageModalBody
+      modalHeader={status}
+      modalBody={message}
+      acceptButtonLabel="ok"
+      accepted={this.props.modalsActions.hideMessageModal}
+    />
+  );
 
   render() {
     const { eventItemId } = this.props.match.params;
@@ -136,30 +120,16 @@ EventPage.propTypes = {
   match: PropTypes.object,
   history: PropTypes.object,
   modalsActions: PropTypes.object,
-  isMessageModalOpen: PropTypes.bool,
-  createEventItemFailed: PropTypes.bool,
-  eventItemCreated: PropTypes.bool,
-  currentDate: PropTypes.string,
-  eventsList: PropTypes.array,
+  currentDate: PropTypes.object,
   eventsActions: PropTypes.object,
-  errorStatusCode: PropTypes.string,
-  createEventItemPending: PropTypes.bool,
-  updateEventItemPending: PropTypes.bool,
-  updateEventItemFulfilled: PropTypes.bool,
-  updateEventItemRejected: PropTypes.bool
+  modalState: PropTypes.object,
+  eventsState: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  isMessageModalOpen: state.messageModal.isMessageModalOpen,
-  createEventItemFailed: state.createEventItem.rejected,
-  eventItemCreated: state.createEventItem.fulfilled,
-  errorStatusCode: state.createEventItem.errorMessage,
-  currentDate: state.currentDate.currentMonthNow,
-  eventsList: state.loadEventItem.events,
-  createEventItemPending: state.createEventItem.pending,
-  updateEventItemPending: state.updateEvents.pending,
-  updateEventItemFulfilled: state.updateEvents.fulfilled,
-  updateEventItemRejected: state.updateEvents.rejected
+  modalState: state.messageModal,
+  currentDate: state.currentDate,
+  eventsState: state.events
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -12,23 +12,25 @@ import { getDateStringFormatYearMonth } from '../../helpers/moment';
 import { getPreviousMonth, getNextMonth, getMonthDaysArr, getMonthName } from '../../helpers/calendar/month';
 import { redirectToCurrentDate, validateYearMonth } from '../../helpers/validation/validate';
 import { getFullYear } from '../../helpers/calendar/year';
-import { getDayEventsObject } from '../../helpers/events/dayEventsObject';
+import { DayEventsObject } from '../../helpers/events/dayEventsObject';
 // Styles
 import * as styles from './MonthPage.scss';
 
 class MonthPage extends Component {
   componentWillMount() {
     const { year, month } = this.props.params;
-    const { history, currentDate } = this.props;
+    const { history } = this.props;
+    const { currentMonthNow } = this.props.currentDate;
     const dateIsNotValid = !validateYearMonth({ year, month });
     if (dateIsNotValid) {
-      redirectToCurrentDate(history, currentDate);
+      redirectToCurrentDate(history, currentMonthNow);
     }
   }
 
   renderDayComponent = ({ key, isCurrentDay, calendarDay, weekday, day }) => {
-    const { dayEvents } = this.props;
-    const { fullDayEvents, hourlyEvents, transitionalEvents } = getDayEventsObject(dayEvents, calendarDay);
+    const { calendarDayEvents } = this.props.eventsState;
+    const dayEventsObject = calendarDayEvents.get(calendarDay) || new DayEventsObject();
+    const { fullDayEvents, hourlyEvents, transitionalEvents } = dayEventsObject;
     return (
       <DayComponent
         key={key}
@@ -74,13 +76,13 @@ class MonthPage extends Component {
 MonthPage.propTypes = {
   params: PropTypes.object,
   history: PropTypes.object,
-  currentDate: PropTypes.string,
-  dayEvents: PropTypes.object
+  currentDate: PropTypes.object,
+  eventsState: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  currentDate: state.currentDate.currentMonthNow,
-  dayEvents: state.loadEventItem.calendarDayEvents
+  currentDate: state.currentDate,
+  eventsState: state.events
 });
 
 export default withRouter(
