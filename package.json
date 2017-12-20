@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Calendar",
   "main": "index.js",
+  "engines": {
+    "node": "6.12.2"
+  },
   "scripts": {
     "start": "node server.js",
     "build": "webpack --verbose --colors --display-error-details --config webpack.config.js",
