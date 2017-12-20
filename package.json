@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build": "webpack --verbose --colors --display-error-details --config webpack.config.js",
+    "build": "webpack --verbose --colors --display-error-details --config ./webpack.config.js",
     "lint": "eslint -c .eslintrc src"
   },
   "license": "MIT",
