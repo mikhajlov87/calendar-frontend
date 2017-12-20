@@ -4,7 +4,8 @@
   "description": "Calendar",
   "main": "index.js",
   "engines": {
-    "node": "6.12.2"
+    "node": "6.12.2",
+    "npm": "3.10.10"
   },
   "scripts": {
     "start": "node server.js",
